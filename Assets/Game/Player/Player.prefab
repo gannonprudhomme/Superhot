@@ -277,6 +277,7 @@ GameObject:
   - component: {fileID: 8622323514496604267}
   - component: {fileID: 105514105997448444}
   - component: {fileID: 6858655439158312910}
+  - component: {fileID: 5217500125791123180}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -339,10 +340,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EquippedWeapon: {fileID: 8822251351324696595}
-  Camera: {fileID: 1578631756842526021}
-  maxSpeed: 10
-  movementSharpness: 15
-  RotationSpeed: 0.1
 --- !u!114 &6858655439158312910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -356,6 +353,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AimPoint: {fileID: 2162488402639161690}
+--- !u!114 &5217500125791123180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4707090414994886930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71bedae8133173948b721fa7ef2d2e4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Camera: {fileID: 1578631756842526021}
+  RotationSpeed: 0.1
+  maxSpeed: 10
+  movementSharpness: 5
+  jumpForce: 20
 --- !u!1 &7283885161713886829
 GameObject:
   m_ObjectHideFlags: 0
