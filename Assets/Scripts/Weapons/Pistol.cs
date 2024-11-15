@@ -17,15 +17,12 @@ public sealed class Pistol : MonoBehaviour, Weapon {
     public GameObject? BulletPrefab;
     
     [Tooltip("Prefab for the throwable object that's used when we throw this")]
-    public ThrowableObject? _ThrowablePrefab; // Ideally this would just be a RigidBody, but for some reason I am getting a cast error when I try to initialize this
+    public ThrowableObject? _ThrowablePrefab;
     
     public ThrowableObject? ThrowablePrefab => _ThrowablePrefab!;
 
     private float lastTimeFired = Mathf.NegativeInfinity;
     private const float fireRate = 1f; // 1 shots per second
-
-    private void Update() {
-    }
     
     public void FirePressed(Transform muzzle) {
         // Spawn the BulletPrefab and rotate it correctly

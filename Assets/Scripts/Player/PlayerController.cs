@@ -18,6 +18,9 @@ public class PlayerController : MonoBehaviour {
     [Tooltip("The player / first-person camera, which we use to check if we're aiming at an interactable")]
     public Camera? Camera;
     
+    [Tooltip("LayerMask we use to ignore collisions for the pickups, so we only get the hover hitbox")]
+    public LayerMask IgnoreHoverCollisionsLayerMask;
+    
     public Pistol? EquippedWeapon; // this will be private & handled by picking up weapons later
 
     public PickupHoveringEvent? PickupHoveringEvent;
@@ -82,7 +85,7 @@ public class PlayerController : MonoBehaviour {
         // Spawn a throwable variation of it
         ThrowableObject throwable = Instantiate(
             EquippedWeapon.ThrowablePrefab!,
-            Muzzle!.position,
+            Muzzle!.position + (Muzzle!.forward * 0.5f), // Move it slightly forward so it doesn't collide w/ the camera
             EquippedWeapon!.transform.rotation
         );
         
@@ -95,38 +98,28 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void CheckIfAimingAtPickup() {
-        // We do more than 1 as the pickups have different colliders - one-to-many for actual physics / RigidBody
-        // and one for the hover hitbox (the trigger)
-        RaycastHit[] hits = new RaycastHit[5]; // I doubt it will ever be more than 5
-
-        Physics.RaycastNonAlloc(
+        if (!Physics.Raycast(
             origin: Camera!.transform.position,
             direction: Camera!.transform.forward,
-            results: hits,
-            maxDistance: 5f
-        );
-        
-        ThrowableObject? hoveringThrowable = null;
-
-        foreach(RaycastHit hit in hits) {
-            if (hit.collider == null) {
-                continue;
-            }
-
-            if (hit.collider.gameObject.TryGetComponent(out ThrowableObject throwableObject)) {
-                hoveringThrowable = throwableObject;
-            } else if (hit.collider.gameObject.TryGetComponent(out ThrowableParentPointer parentPointer)) {
-                hoveringThrowable = parentPointer.Parent;
-            }
-            
-            // Found one!
-            if (hoveringThrowable != null) {
-                break;
-            }
+            out RaycastHit hit,
+            maxDistance: 5f,
+            layerMask: ~IgnoreHoverCollisionsLayerMask
+        )) {
+            currentAimedAtThrowableObject = null;
+            PickupHoveringEvent!.OnNotHovering?.Invoke();
+            return;
         }
 
-        if (hoveringThrowable != null) {
-            currentAimedAtThrowableObject = hoveringThrowable;
+        ThrowableObject? throwableHit = null;
+
+        if (hit.collider.gameObject.TryGetComponent(out ThrowableObject throwableObject)) {
+            throwableHit = throwableObject;
+        } else if (hit.collider.gameObject.TryGetComponent(out ThrowableParentPointer parentPointer)) {
+            throwableHit = parentPointer.Parent;
+        }
+        
+        if (throwableHit != null) {
+            currentAimedAtThrowableObject = throwableHit;
             
             PickupHoveringEvent!.OnHovering?.Invoke();
         } else {

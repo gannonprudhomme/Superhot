@@ -457,12 +457,8 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 105514105997448444, guid: 9def381662e480d438232c6fb3873ad9, type: 3}
-      propertyPath: forceMode
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 105514105997448444, guid: 9def381662e480d438232c6fb3873ad9, type: 3}
-      propertyPath: forceValue
-      value: 5000
+      propertyPath: IgnoreCollisionsLayerMask.m_Bits
+      value: 192
       objectReference: {fileID: 0}
     - target: {fileID: 1609865032141817035, guid: 9def381662e480d438232c6fb3873ad9, type: 3}
       propertyPath: m_LocalPosition.x

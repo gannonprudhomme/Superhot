@@ -416,22 +416,6 @@ MonoBehaviour:
   m_ObsoleteUseShadowQualitySettings: 0
   m_ObsoleteCustomShadowResolution: 512
   m_ObsoleteContactShadows: 0
---- !u!114 &190712118 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4159912600371458935, guid: ad71a44770bad12449198da5e1ee5869, type: 3}
-  m_PrefabInstance: {fileID: 5293985520114700180}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aced58324d5be4d47807bbc255c71d27, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &190712119 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3117901634678438615, guid: ad71a44770bad12449198da5e1ee5869, type: 3}
-  m_PrefabInstance: {fileID: 5293985520114700180}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &432432459
 GameObject:
   m_ObjectHideFlags: 0
@@ -811,73 +795,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1356586158}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1548313864
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1548313865}
-  - component: {fileID: 1548313866}
-  - component: {fileID: 1548313867}
-  m_Layer: 6
-  m_Name: Hover Hitbox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1548313865
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1548313864}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 190712119}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1548313866
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1548313864}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1548313867
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1548313864}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd45fabecc160a74cb7920c4497255a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Parent: {fileID: 190712118}
 --- !u!1 &1588454744
 GameObject:
   m_ObjectHideFlags: 0
@@ -1212,14 +1129,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Throwable Pistol
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 2261661535125377707, guid: ad71a44770bad12449198da5e1ee5869, type: 3}
-    - {fileID: 3556945309006557665, guid: ad71a44770bad12449198da5e1ee5869, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 3117901634678438615, guid: ad71a44770bad12449198da5e1ee5869, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1548313865}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ad71a44770bad12449198da5e1ee5869, type: 3}
 --- !u!1001 &5482426019100338456

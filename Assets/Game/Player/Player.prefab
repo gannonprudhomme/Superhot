@@ -342,6 +342,9 @@ MonoBehaviour:
   Muzzle: {fileID: 4114076202807892538}
   WeaponSpawnPoint: {fileID: 396000932328867625}
   Camera: {fileID: 1578631756842526021}
+  IgnoreHoverCollisionsLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
   EquippedWeapon: {fileID: 5361138655831565617}
   PickupHoveringEvent: {fileID: 11400000, guid: 56e404231e60fc34cbbd477fb8ea41ad, type: 2}
 --- !u!114 &6858655439158312910
