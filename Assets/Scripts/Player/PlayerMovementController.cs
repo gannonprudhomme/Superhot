@@ -28,7 +28,8 @@ public class PlayerMovementController : MonoBehaviour  {
     private const float DownForce = 55f;
     private const float TerminalVelocity = -10f;
     private const float JumpForce = 20f;
-
+    
+    private const float MinTimeDilation = 0.1f;
     public float TimeDilation {
         get {
             // When we're in the air it's always 1
@@ -40,8 +41,7 @@ public class PlayerMovementController : MonoBehaviour  {
             float currSpeed = velocity.magnitude;
             
             // Prevent it from going below minTimeDilation
-            const float minTimeDilation = 0.1f;
-            float dilation = Mathf.Max(currSpeed / MaxSpeed, minTimeDilation);
+            float dilation = Mathf.Max(currSpeed / MaxSpeed, MinTimeDilation);
             
             // Prevent it from being above 1
             return Mathf.Min(dilation, 1f);
@@ -54,6 +54,10 @@ public class PlayerMovementController : MonoBehaviour  {
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
+        
+        // Dynamically changing this makes the forces different based on the time dilation
+        // so it seems to need to be fixed
+        Time.fixedDeltaTime = 0.02F * MinTimeDilation;
     }
 
     // Update is called once per frame
