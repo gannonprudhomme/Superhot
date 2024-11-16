@@ -75,3 +75,9 @@ crashlytics-build.properties
 .DS_Store
 
 .idea/
+
+# I really don't understand why this isn't included
+# Why would I check in dependencies? That's literally what package managers are for
+# smfh
+# I guess Unity packages aren't included in a package.json or something, wth
+# Assets/Plugins/
