@@ -50,17 +50,8 @@ public class PlayerController : MonoBehaviour {
         if (fireAction!.WasPressedThisFrame()) {
             if (EquippedWeapon != null) {
                 EquippedWeapon.FirePressed(muzzle: Muzzle!);
-            } else if (currentAimedAtThrowableObject != null) {
-                EquippedWeapon = Instantiate(
-                    currentAimedAtThrowableObject.WeaponPrefab!,
-                    WeaponSpawnPoint // We want it to be under the Weapon Spawn Point
-                );
-
-                EquippedWeapon!.transform.position = WeaponSpawnPoint!.TransformPoint(Vector3.zero);
-                EquippedWeapon!.transform.localEulerAngles = Vector3.zero;
-
-                Destroy(currentAimedAtThrowableObject!.gameObject);
-                currentAimedAtThrowableObject = null;
+            } else if (currentAimedAtThrowableObject != null) { // Pick up weapon
+                StartCoroutine(PickupObject(currentAimedAtThrowableObject!));
             }
         }
 
@@ -127,5 +118,28 @@ public class PlayerController : MonoBehaviour {
             
             PickupHoveringEvent!.OnNotHovering?.Invoke();
         }
+    }
+
+    private IEnumerator PickupObject(ThrowableObject throwableObject) {
+        if (throwableObject.IsBeingPickedUp) {
+            Debug.Log("Almost picked it up twice!");
+            yield break;
+        }
+        
+        // Animate it coming to the hand
+        yield return throwableObject.Pickup(
+            goalTransform: WeaponSpawnPoint!
+        );
+        
+        EquippedWeapon = Instantiate(
+            throwableObject.WeaponPrefab!,
+            WeaponSpawnPoint
+        );
+
+        EquippedWeapon!.transform.position = WeaponSpawnPoint!.TransformPoint(Vector3.zero);
+        EquippedWeapon!.transform.localEulerAngles = Vector3.zero;
+
+        Destroy(throwableObject.gameObject);
+        currentAimedAtThrowableObject = null;
     }
 }
