@@ -470,4 +470,26 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
         CurrentWeapon = null;
     }
 
+    public void PlayDamagedVFX(Vector3 hitPoint) {
+        VisualEffect damagedVFX = Instantiate(OnHitVFXPrefab!, hitPoint, Quaternion.identity);
+        
+        // Destroy after 2 seconds
+        Destroy(damagedVFX.gameObject, 2f);
+    }
+
+    public void TakeDamage(Vector3 hitPoint) {
+        health -= 1;
+        
+        if (health <= 0) {
+            ChangeState(new KilledState(hitPoint));
+        }
+    }
+
+    /*
+    public float pickupradius = 5f;
+    private void OnDrawGizmosSelected() {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(transform.position, pickupradius);
+    }
+    */
 }

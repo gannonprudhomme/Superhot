@@ -4,6 +4,11 @@ using UnityEngine.InputSystem;
 
 #nullable enable
 
+struct AnimationStates {
+    public const string PunchLeft = "Base Layer.Punch Left";
+    public const string PunchRight = "Base Layer.Punch Right";
+}
+
 public interface PlayerState {
     public void OnEnter(PlayerController playerController) { }
     public void OnUpdate(PlayerController playerController) { }
@@ -15,8 +20,14 @@ class UnarmedState : PlayerState {
     private readonly InputAction attackAction = InputSystem.actions.FindAction("Attack");
 
     // Local state
-    private Collidable? currentAimedAtEnemy = null;
+    private Collidable? currentAimedAtCollidable = null;
     private ThrowableObject? currentAimedAtThrowableObject = null;
+    private Vector3 aimedAtPoint = Vector3.zero;
+
+    public bool useLeftPunch = false; // Used to alternate between left & right arms
+    private const float punchAnimationDuration = 0.5f; // TODO: Honestly there's a chance we just ignore this & just use cooldown
+    private const float punchCooldown = 0.25f;
+    private float timeOfLastPunch = Mathf.NegativeInfinity;
 
     public void OnUpdate(PlayerController playerController) {
         CheckIfAimingAtObjectOrEnemy(playerController);
@@ -25,8 +36,8 @@ class UnarmedState : PlayerState {
             if (currentAimedAtThrowableObject != null) {
                 playerController.ChangeState(new PickupThrowableObjectState(currentAimedAtThrowableObject));
                 return;
-            } else if (currentAimedAtEnemy != null) {
-                AttemptPunch();
+            } else if (currentAimedAtCollidable != null) {
+                AttemptPunch(currentAimedAtCollidable, playerController);
             }
         }
     }
@@ -35,9 +46,23 @@ class UnarmedState : PlayerState {
         playerController.PickupHoveringEvent!.OnNotHovering?.Invoke();
     }
 
+    private void AttemptPunch(Collidable enemyCollidable, PlayerController playerController) {
+        if (Time.time - timeOfLastPunch < (punchCooldown + punchAnimationDuration)) {
+            return;
+        }
+
+        timeOfLastPunch = Time.time;
+        
+        // Damage the collidable (enemy) we're aiming at *immediately*
+        enemyCollidable.OnHit?.Invoke(new Collidable.Parameters() { hitPoint = aimedAtPoint, isLethal = false });
+
+        playerController.animator!.Play(useLeftPunch ? AnimationStates.PunchLeft : AnimationStates.PunchRight);
+        useLeftPunch = !useLeftPunch; // Invert it
+    }
+
     private void CheckIfAimingAtObjectOrEnemy(PlayerController playerController) {
         // To start, null both out
-        currentAimedAtEnemy = null;
+        currentAimedAtCollidable = null;
         currentAimedAtThrowableObject = null;
         
         if (!Physics.Raycast(
@@ -51,13 +76,17 @@ class UnarmedState : PlayerState {
             return;
         }
 
+        aimedAtPoint = hit.point;
+        
         if (hit.collider.gameObject.TryGetComponent(out ThrowableParentPointer parentPointer)) {
             currentAimedAtThrowableObject = parentPointer.Parent;
             
             playerController.PickupHoveringEvent!.OnHovering?.Invoke(PickupHoveringEvent.HoverType.THROWABLE);
             
         } else if (hit.collider.gameObject.TryGetComponent(out Collidable collidable)) {
-            currentAimedAtEnemy = collidable;
+            // TODO: there might be collidable's that aren't enemies
+            
+            currentAimedAtCollidable = collidable;
             
             playerController.PickupHoveringEvent!.OnHovering?.Invoke(PickupHoveringEvent.HoverType.ENEMY);
         } else {
@@ -151,7 +180,8 @@ class GunEquippedState : PlayerState {
 
 [RequireComponent(
     typeof(PlayerMovementController),
-    typeof(Target)
+    typeof(Target),
+    typeof(Animator)
 )]
 public class PlayerController : MonoBehaviour {
     [Header("References")]
@@ -171,7 +201,8 @@ public class PlayerController : MonoBehaviour {
 
     public PickupHoveringEvent? PickupHoveringEvent;
     public ReloadEvent? ReloadEvent;
-    
+
+    public Animator? animator { get; private set; }
     private InputAction? fireAction;
     private InputAction? throwAction;
     private InputAction? pickupAction;
@@ -181,6 +212,7 @@ public class PlayerController : MonoBehaviour {
     #nullable enable
 
     private void Awake() {
+        animator = GetComponent<Animator>();
         fireAction = InputSystem.actions.FindAction("Attack");
         throwAction = InputSystem.actions.FindAction("Throw");
 

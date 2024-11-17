@@ -7,6 +7,9 @@ using UnityEngine;
 
 #nullable enable
 
+// Honestly this is more like a *Thrown* object - the Pistol class is more of the ThrowableObject
+// or a bottle in the hand would be a ThrowableObject
+// thus consider renaming this
 [RequireComponent(
     typeof(Rigidbody)
 )]

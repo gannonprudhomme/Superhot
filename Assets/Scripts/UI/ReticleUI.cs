@@ -57,12 +57,12 @@ public class ReticleUI : MonoBehaviour  {
         const float shrinkDuration = 0.1f;
         var scaleTween = ReticleRectTransform
             .DOScale(endValue: reloadScale, duration: shrinkDuration)
-            .SetEase(Ease.OutSine);
+            .SetEase(Ease.OutSine); // idk
 
         float rotationDuration = duration - shrinkDuration;
         var rotateTween = ReticleRectTransform
             .DORotate(new Vector3(0, 0, ReticleRectTransform!.rotation.eulerAngles.z + rotationIncrement), duration - shrinkDuration)
-            .SetEase(Ease.OutSine);
+            .SetEase(Ease.OutSine); // idk
 
         Sequence sequence = DOTween.Sequence();
         sequence.Append(scaleTween);
@@ -70,13 +70,15 @@ public class ReticleUI : MonoBehaviour  {
 
         yield return sequence.WaitForCompletion();
         
-        Debug.Log("Done!");
         yield return AnimateReloadCompletion();
     }
 
     private IEnumerator AnimateReloadCompletion() {
+        // TODO: should be ease out elastic probably?  It needs to go above the value then back to it
+        // it's also really fast
+
         var scaleBackTween = ReticleRectTransform!
-            .DOScale(endValue: normalScale, duration: 0.1f)
+            .DOScale(endValue: normalScale, duration: 0.1f) // TODO: idk what this should be
             .SetEase(Ease.OutElastic)
             .SetUpdate(UpdateType.Normal, isIndependentUpdate: true); // Ignore timescale
         

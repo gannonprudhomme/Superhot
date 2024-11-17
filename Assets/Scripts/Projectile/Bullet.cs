@@ -13,7 +13,7 @@ public class Bullet : MonoBehaviour {
 
     public float Radius = 2f;
 
-    [Tooltip("Layers this projectile can hit")]
+    [Tooltip("Layers this projectile can hit")] // Should be all for now
     public LayerMask HittableLayers = -1;
     
     private Vector3 lastRootPosition = Vector3.negativeInfinity;
