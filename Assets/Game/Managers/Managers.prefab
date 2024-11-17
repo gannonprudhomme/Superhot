@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2504174148840956704}
   - component: {fileID: 7570143083082257612}
+  - component: {fileID: 3806966161054815405}
   m_Layer: 0
-  m_Name: Level Manager
+  m_Name: Managers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,3 +47,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AllLevels:
   - Test Level
+--- !u!114 &3806966161054815405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6930346976496490850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7147307c0bd127c4a95a370d41e6d032, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prefabs:
+  - {fileID: 5944466225402746086, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
+  - {fileID: 9109574753712525345, guid: add7d52dd48d6194c8c9957f14db53c4, type: 3}
+  - {fileID: 5498063768781464282, guid: ad71a44770bad12449198da5e1ee5869, type: 3}
