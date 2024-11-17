@@ -7,8 +7,11 @@ public interface Weapon {
     
     // Muzzle is really just where the bullets fire from
     // It's not actually the muzzle of the gun
-    public void FirePressed(Transform muzzle);
+    public bool FirePressed(Transform muzzle);
     public void FireReleased();
+    
+    public bool RequiresReload { get; }
+    public float ReloadDuration { get; }
 }
 
 public sealed class Pistol : MonoBehaviour, Weapon {
@@ -20,14 +23,17 @@ public sealed class Pistol : MonoBehaviour, Weapon {
     public ThrowableObject? _ThrowablePrefab;
     
     public ThrowableObject? ThrowablePrefab => _ThrowablePrefab!;
+    
+    public float ReloadDuration => 1f; // 1 shot per second
+    public bool RequiresReload => true;
 
     private float lastTimeFired = Mathf.NegativeInfinity;
-    private const float fireRate = 1f; // 1 shots per second
+    
     
     public void FirePressed(Transform muzzle) {
         // Spawn the BulletPrefab and rotate it correctly
         // and we should be good to go tbh, it should handle the rest
-        if (Time.time - lastTimeFired < fireRate) {
+        if (Time.time - lastTimeFired < ReloadDuration) {
             Debug.Log("Cooling down!");
             return;
         }

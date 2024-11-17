@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9145563941434351223}
   - component: {fileID: 4501554871194446426}
   m_Layer: 5
-  m_Name: Recticle Canvas
+  m_Name: RecticleUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54,8 +54,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ReticleImage: {fileID: 3081533081347527691}
+  ReticleRectTransform: {fileID: 5364919967169810151}
   HoveringImage: {fileID: 6249908636805602917}
   PickupHoveringEvent: {fileID: 11400000, guid: 56e404231e60fc34cbbd477fb8ea41ad, type: 2}
+  ReloadEvent: {fileID: 11400000, guid: 0e9deca96b9672749a803b73252c686d, type: 2}
 --- !u!223 &6092440906252721343
 Canvas:
   m_ObjectHideFlags: 0
@@ -381,7 +383,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 10, y: 10}
+  m_SizeDelta: {x: 48, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6581704116369612312
 CanvasRenderer:
@@ -411,7 +413,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: bb151e81ef74d5841beb3a95985d8ae9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -686,7 +688,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8453031220702982055}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 

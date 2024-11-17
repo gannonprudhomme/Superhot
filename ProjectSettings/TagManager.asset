@@ -13,9 +13,9 @@ TagManager:
   - UI
   - Ignore Collisions
   - Ignore Hover
-  - 
-  - 
-  - 
+  - Player
+  - Enemy
+  - Pickupable
   - 
   - 
   - 

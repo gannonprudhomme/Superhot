@@ -49,7 +49,12 @@ public class PlayerController : MonoBehaviour {
     private void HandleInputs() {
         if (fireAction!.WasPressedThisFrame()) {
             if (EquippedWeapon != null) {
-                EquippedWeapon.FirePressed(muzzle: Muzzle!);
+                bool didFire = EquippedWeapon.FirePressed(muzzle: Muzzle!);
+                
+                if (didFire && EquippedWeapon.RequiresReload) {
+                    ReloadEvent!.ReloadStart?.Invoke(EquippedWeapon.ReloadDuration);
+                }
+                
             } else if (currentAimedAtThrowableObject != null) { // Pick up weapon
                 StartCoroutine(PickupObject(currentAimedAtThrowableObject!));
             }
