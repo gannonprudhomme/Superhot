@@ -8,6 +8,8 @@ using UnityEngine;
 public class Target : MonoBehaviour {
     public static Target instance { get; private set; }
     
+    public Collider? TargetCollider;
+    
     public Transform? AimPoint;
     
     private void Awake() {

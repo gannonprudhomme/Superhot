@@ -376,10 +376,8 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
         navMeshAgent = GetComponent<NavMeshAgent>();
 
         if (CurrentWeapon != null) {
-            Debug.Log("Starting FireGunState");
             currentState = new FireGunState(CurrentWeapon);
         } else {
-            Debug.Log("Starting UnarmedChaseState");
             currentState = new UnarmedChaseState(FistTransform!);
         }
     }
@@ -432,6 +430,10 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
         return false;
     }
 
+    public void SetDestination(Vector3 destination) {
+        navMeshAgent!.SetDestination(destination);
+    }
+    
 
     public void SetStopped(bool isStopped) {
         navMeshAgent!.isStopped = isStopped;

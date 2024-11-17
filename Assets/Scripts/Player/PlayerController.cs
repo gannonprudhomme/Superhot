@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour {
     public Pistol? EquippedWeapon; // this will be private & handled by picking up weapons later
 
     public PickupHoveringEvent? PickupHoveringEvent;
+    public ReloadEvent? ReloadEvent;
     
     private InputAction? fireAction;
     private InputAction? throwAction;
@@ -71,7 +72,7 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    public const float throwForce = 5000f; // This makes no sense, why is it so high
+    public const float throwForce = 8_000f; // This makes no sense, why is it so high
     
     private void AttemptThrowWeapon() {
         if (EquippedWeapon == null) {

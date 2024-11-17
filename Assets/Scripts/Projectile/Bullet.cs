@@ -26,6 +26,11 @@ public class Bullet : MonoBehaviour {
     }
 
     private void Update() {
+        if (Time.time - timeOfStart > Lifetime) {
+            Destroy(gameObject);
+            return;
+        }
+        
         HitCheck();
         
         transform.position += velocity * Time.deltaTime;
@@ -69,7 +74,10 @@ public class Bullet : MonoBehaviour {
 
     private void OnHit(Vector3 point, Vector3 normal, Collider hitCollider) {
         if (hitCollider.gameObject.TryGetComponent(out Collidable collidable)) {
-            collidable.OnHit?.Invoke(point);
+            collidable.OnHit?.Invoke(new Collidable.Parameters() { hitPoint = point, isLethal = true });
+        } else if (hitCollider.gameObject.TryGetComponent(out Rigidbody rigidbody)) {
+            float force = 100f;
+            rigidbody.AddForceAtPosition(velocity.normalized * force, point, ForceMode.Impulse);
         }
         
         Destroy(gameObject);

@@ -15,6 +15,9 @@ public class ThrowableObject : MonoBehaviour  {
 
     [Tooltip("Weapon prefab which is created whenever this is picked up")]
     public Pistol? WeaponPrefab;
+
+    [Tooltip("Prefab that is created when this object is destroyed")]
+    public GameObject? DestructedPrefab;
     
     public bool IsBeingPickedUp => moveTween != null || rotateTween != null;
 
@@ -43,6 +46,11 @@ public class ThrowableObject : MonoBehaviour  {
                 hitPoint = hitCollider.GetContact(0).point,
                 isLethal = false
             });
+            
+            GameObject destructedObject = Instantiate(DestructedPrefab!, transform.position, transform.rotation);
+            Destroy(destructedObject, 5f);
+            
+            Destroy(gameObject);
         }
     }
 
@@ -68,7 +76,6 @@ public class ThrowableObject : MonoBehaviour  {
 
         rotateTween.onUpdate = () => {
             rotateTween.ChangeEndValue(goalTransform.rotation.eulerAngles, snapStartValue: true);
-            Debug.Log($"Current rotation is {transform.rotation.eulerAngles}, updating goal to {goalTransform.rotation.eulerAngles}");
         };
         
         moveTween.onUpdate = () => {
