@@ -27,7 +27,7 @@ public class ThrowableObject : MonoBehaviour  {
     private TweenerCore<Vector3, Vector3, VectorOptions>? moveTween;
     private TweenerCore<Quaternion, Vector3, QuaternionOptions>? rotateTween;
 
-    private bool hasCollided = false;
+    private bool hasCollided = true;
 
     private void Awake() {
         Rigidbody = GetComponent<Rigidbody>();
@@ -37,7 +37,6 @@ public class ThrowableObject : MonoBehaviour  {
         moveTween?.Kill();
         rotateTween?.Kill();
     }
-
 
     private void OnCollisionEnter(Collision hitCollider) {
         if (hasCollided) return;
@@ -55,6 +54,14 @@ public class ThrowableObject : MonoBehaviour  {
             
             Destroy(gameObject);
         }
+    }
+
+    // Only called when the player throws this, so we set the flag to make it a chance that it gets destructed
+    // when it hits an enemy
+    //
+    // When it's dropped / spawned, we shouldn't have this flag set
+    public void OnThrown() {
+        hasCollided = false;
     }
 
     public IEnumerator Pickup(
