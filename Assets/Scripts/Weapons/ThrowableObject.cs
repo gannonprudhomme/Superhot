@@ -21,6 +21,8 @@ public class ThrowableObject : MonoBehaviour  {
     private TweenerCore<Vector3, Vector3, VectorOptions>? moveTween;
     private TweenerCore<Quaternion, Vector3, QuaternionOptions>? rotateTween;
 
+    private bool hasCollided = false;
+
     private void Awake() {
         Rigidbody = GetComponent<Rigidbody>();
     }
@@ -28,6 +30,20 @@ public class ThrowableObject : MonoBehaviour  {
     private void OnDestroy() {
         moveTween?.Kill();
         rotateTween?.Kill();
+    }
+
+
+    private void OnCollisionEnter(Collision hitCollider) {
+        if (hasCollided) return;
+        
+        hasCollided = true;
+        
+        if (hitCollider.gameObject.TryGetComponent(out Collidable collidable)) {   
+            collidable.OnHit?.Invoke(new Collidable.Parameters {
+                hitPoint = hitCollider.GetContact(0).point,
+                isLethal = false
+            });
+        }
     }
 
     public IEnumerator Pickup(

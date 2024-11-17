@@ -1,111 +1,456 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using Object = UnityEngine.Object;
 
 #nullable enable
+
+struct AnimationStates {
+    public const string Idle = "Base Layer.Idle";
+    public const string Melee = "Base Layer.Melee";
+}
 
 // I'm wondering if we need a movement state and an attack state
 // but the attack state probably needs to influence the movement state
 // e.g. we should charge if we have a melee weapon, but might not want to with a gun
 // and if we're unarmed we need to go find a weapon (and/or charge) - this might be simpler though
 public abstract class State {
-    // Honestly we're just going to need the red guy's state
-    protected RedGuy redGuy;
-    
-    public virtual void OnEnter() { }
-    public virtual void OnUpdate() { }
-    public virtual void OnExit() { }
+    public virtual void OnEnter(RedGuy redGuy) { }
+    public virtual void OnUpdate(RedGuy redGuy) { }
+    public virtual void OnExit(RedGuy redGuy) { }
 }
 
 // Don't want this to be public? Just for this file
-sealed class Unarmed : State {
-    public override void OnUpdate() {
+sealed class UnarmedChaseState : State {
+    private readonly Transform fistTransform;
+    private const float meleeRange = 2f;
+
+    private readonly LayerMask pickupableLayerMask = LayerMask.GetMask("Pickupable");
+    
+    public UnarmedChaseState(Transform fistTransform) {
+        this.fistTransform = fistTransform;
+    }
+    
+    public override void OnUpdate(RedGuy redGuy) {
         // See if there's a weapon nearby
+        var nearbyWeapon = FindBestNearbyWeapon(redGuy.transform.position);
+
+        if (nearbyWeapon != null) {
+            Debug.Log("Found nearby weapon!");
+            redGuy.ChangeState(new MoveToPickupState(nearbyWeapon));
+            return;
+        }
         
-        // if there is, maybe "lean" towards it?
-        // once we are ready to grab it, move to PickupWeapon()   
-        GameObject weapon; // Only do this if we found one
-        redGuy.ChangeState(new PickupWeapon());
+        // Charge the player
+        redGuy.SetDestination(Target.instance!.AimPoint!.position);
+        
+        // If we're in range & have line of sight, melee
+        bool inMeleeRange = Vector3.Distance(fistTransform.position, Target.instance!.AimPoint!.position) < meleeRange;
+        bool canMelee = inMeleeRange && redGuy.HasLineOfSightToTarget();
+        
+        if (canMelee) {
+            redGuy.ChangeState(new UnarmedAttackState(fistTransform));
+            return;
+        }
+    }
+
+    private ThrowableObject? FindBestNearbyWeapon(Vector3 position) {
+        Collider[] foundColliders = new Collider[5];
+        
+        int foundCount = Physics.OverlapSphereNonAlloc(
+            position: position,
+            radius: 5f,
+            results: foundColliders,
+            layerMask: pickupableLayerMask
+        );
+        
+        if (foundCount == 0) {
+            return null;
+        }
+        
+        ThrowableObject? closestWeapon = null;
+        int closestDistance = int.MaxValue;
+        
+        foreach (var collider in foundColliders) {
+            if (collider == null) {
+                continue;
+            }
+            
+            ThrowableObject? foundThrowableObject;
+            
+            if (collider.TryGetComponent<ThrowableObject>(out foundThrowableObject)) {
+            } else if (collider.TryGetComponent<ThrowableParentPointer>(out var parentPointer)) {
+                foundThrowableObject = parentPointer.Parent;
+            }
+            
+            if (foundThrowableObject == null) {
+                continue;
+            }
+
+            bool isActualWeapon = true;
+
+            float dist = Vector3.Distance(position, foundThrowableObject.transform.position);
+
+            if (dist < closestDistance) {
+                closestWeapon = foundThrowableObject;
+                closestDistance = (int) dist;
+            }
+        }
+        
+        return closestWeapon;
     }
 }
 
-sealed class PickupWeapon: State {}
+// We're in melee range - attack!
+sealed class UnarmedAttackState : State {
+    // Transform of the fist we use to determine whether we hit the player or not
+    private readonly Transform fistTransform;
 
-/*
-sealed class GunEquipped : State {
-    private Weapon gun;
+    private const float fistRadius = 0.25f;
+    private const float animationDuration = 0.5f;
+    private const float attackCooldown = 1f; // How long we should stay on this state before transitioning away
+    private float totalAttackDuration => animationDuration + attackCooldown;
+    private float timeOfAttackStart;
+
+    private readonly LayerMask playerLayerMask = LayerMask.GetMask("Player");
     
-    public GunEquipped(Weapon gun) {
+    public UnarmedAttackState(Transform fistTransform) {
+        this.fistTransform = fistTransform;
+    }
+    
+    public override void OnEnter(RedGuy redGuy) {
+        timeOfAttackStart = Time.time;
+
+        // Start the animation
+        // redGuy.animator!.CrossFade(AnimationStates.Melee, 0.25f); // Idk what to t this to
+        redGuy.animator!.Play(AnimationStates.Melee);
+    }
+
+    public override void OnUpdate(RedGuy redGuy) {
+        float timeSinceStart = Time.time - timeOfAttackStart;
+        if (timeSinceStart > totalAttackDuration) {
+            redGuy.ChangeState(new UnarmedChaseState(fistTransform));
+            return;
+        }
+        
+        if (timeSinceStart > animationDuration) {
+            // We're in the cooldown phase
+            return;
+        }
+
+        // We're still in the attack animation - did we hit the player this frame?
+        Collider[] collider = new Collider[1];
+        int count = Physics.OverlapSphereNonAlloc(
+            position: fistTransform.position,
+            radius: fistRadius,
+            results: collider,
+            layerMask: playerLayerMask
+        );
+
+        if (count > 0) {
+            Debug.Log($"Hit player '{collider[0].gameObject.name}'");
+            DamagePlayer();
+            return;
+        }
+    }
+
+    public override void OnExit(RedGuy redGuy) {
+        redGuy.animator!.Play(AnimationStates.Idle);
+    }
+
+    private void DamagePlayer() {
+        Debug.Log("Hit player!");
+    }
+}
+
+sealed class MoveToPickupState : State {
+    private readonly ThrowableObject objectToPickUp;
+
+    public MoveToPickupState(ThrowableObject toPickUp) {
+        this.objectToPickUp = toPickUp;
+    }
+    
+    public override void OnEnter(RedGuy redGuy) {
+        redGuy.SetDestination(objectToPickUp.transform.position);
+    }
+
+    private const float pickupDistance = 1f;
+
+    public override void OnUpdate(RedGuy redGuy) {
+        if (objectToPickUp == null) {
+            Debug.Log("Can't pick up object, it was destroyed");
+            // Go back, attempt to find a new one / etc
+            redGuy.ChangeState(new UnarmedChaseState(redGuy.FistTransform!));
+            return;
+        }
+        
+        bool closeEnoughToPickUp = Vector3.Distance(redGuy.transform.position, objectToPickUp.transform.position) < pickupDistance;
+        if (!closeEnoughToPickUp) {
+            return;
+        }
+        
+        redGuy.ChangeState(new PerformPickupState(objectToPickUp));
+    }
+}
+
+sealed class PerformPickupState: State {
+    private readonly ThrowableObject objectToPickUp;
+    private const float animationDuration = 0.25f;
+    
+    private float timeOfAnimStart;
+    
+    public PerformPickupState(ThrowableObject toPickUp) {
+        this.objectToPickUp = toPickUp;
+    }
+    
+    public override void OnEnter(RedGuy redGuy) {
+        timeOfAnimStart = Time.time;
+    }
+    
+    public override void OnUpdate(RedGuy redGuy) {
+        if (objectToPickUp == null) {
+            Debug.Log("Can't pick up object, it was destroyed");
+            // Go back, attempt to find a new one / etc
+            redGuy.ChangeState(new UnarmedChaseState(redGuy.FistTransform!));
+            return;
+        }
+        
+        bool readyToPickUp = Time.time - timeOfAnimStart < animationDuration;
+        if (!readyToPickUp) {
+            return;
+        }
+        
+        redGuy.EquipWeapon(objectToPickUp.WeaponPrefab!);
+        
+        Object.Destroy(objectToPickUp.gameObject);
+
+        redGuy.ChangeState(new GunFindLineOfSightState(redGuy.CurrentWeapon!, Target.instance!));
+    }
+}
+
+// We have a gun equipped, and have (or just had) line of sight
+// so shoot!
+sealed class FireGunState : State {
+    private readonly Pistol gun;
+    
+    public FireGunState(Pistol gun) {
         this.gun = gun;
     }
     
-    public override void OnEnter() {
+    public override void OnEnter(RedGuy redGuy) {
         // Maybe do an animation to show the gun?
+        redGuy.SetCanOnlyRotate(true);
+    }
+
+    public override void OnUpdate(RedGuy redGuy) {
+        // TODO: Might need to make sure the pickup gun animation is done?
+        
+        // When they have a gun do they strafe? I dont' think they do
+        // For now just assume no
+
+        if (!redGuy.HasLineOfSightToTarget()) {
+            Debug.Log("No line of sight in fire gun");
+            // We don't have line of sight anymore
+            redGuy.ChangeState(new GunFindLineOfSightState(gun, Target.instance));
+            return;
+        }
+        
+        // Rotate towards the player
+        redGuy.RotateTowards(Target.instance!.AimPoint!.position);
+        
+        Vector3 direction = (Target.instance!.AimPoint!.position - redGuy!.Muzzle!.position).normalized;
+        
+        gun.FireIfPossible(redGuy.Muzzle!.position, direction);
+    }
+    
+    public override void OnExit(RedGuy redGuy) {
+        redGuy.SetCanOnlyRotate(false);
+    }
+}
+sealed class GunFindLineOfSightState: State {
+    private readonly Pistol gun;
+    private readonly Target target;
+    
+    public GunFindLineOfSightState(Pistol gun, Target target) {
+        this.gun = gun;
+        this.target = target;
+    }
+
+    public override void OnEnter(RedGuy redGuy) {
+        redGuy.SetDestination(target.AimPoint!.position);
+    }
+    
+    public override void OnUpdate(RedGuy redGuy) {
+        // As soon as we have line of sight, we should fire
+        if (redGuy.HasLineOfSightToTarget()) {
+            redGuy.ChangeState(new FireGunState(gun));
+            return;
+        }
+        
+        // Update the position in case the player moved
+        redGuy.SetDestination(target.AimPoint!.position);
     }
 }
 
-sealed class MeleeEquiped : State {
-    private Weapon meleeWeapon;
+// Transitioned to when we get hit, but not killed
+sealed class InterruptedState : State {
+    private const float animationDuration = 0.25f;
+    private float timeOfAnimStart;
     
-    public MeleeEquiped(Weapon weapon) {
-        this.meleeWeapon = weapon;
+    public override void OnEnter(RedGuy redGuy) {
+        timeOfAnimStart = Time.time;
+        
+        redGuy.SetStopped(true);
+        
+        redGuy.DropWeapon();
     }
     
-    public override void OnUpdate() {
-        // Charge!
+    public override void OnUpdate(RedGuy redGuy) {
+        bool readyToResume = Time.time - timeOfAnimStart < animationDuration;
+        if (!readyToResume) {
+            return;
+        }
+        
+        redGuy.ChangeState(new UnarmedChaseState(redGuy.FistTransform!));
+    }
+
+    public override void OnExit(RedGuy redGuy) {
+        redGuy.SetStopped(false);
     }
 }
-*/
 
-sealed class FindNewPosition: State { }
-
-sealed class Killed : State {
+sealed class KilledState : State {
     private Vector3 hitPoint;
     
-    public Killed(Vector3 hitPoint, RedGuy redGuy) {
-        this.redGuy = redGuy; // why tf I am not enforced by the compiler to do this
+    public KilledState(Vector3 hitPoint) {
         this.hitPoint = hitPoint;
     }
     
-    public override void OnEnter() {
+    public override void OnEnter(RedGuy redGuy) {
         // Start the animation
         // also ragdoll maybe?
+        
+        // Drop the weapon
+        redGuy.DropWeapon();
+        
+        // Create the destroyed prefab
+        var destroyedInstance = Object.Instantiate(redGuy.DestroyedPrefab!, redGuy.transform.position, redGuy.transform.rotation);
+        Object.Destroy(destroyedInstance, 2f); // Destroy after 2 seconds
+
+        // Delete the actual one
+        Object.Destroy(redGuy.gameObject);
     }
 }
 
 [RequireComponent(
-    typeof(NavMeshAgent)
+    typeof(NavMeshAgent),
+    typeof(Animator)
 )]
 public class RedGuy : MonoBehaviour { // TODO: I might as well just call this Enemy
-    public Weapon? CurrentWeapon;
+    public Pistol? CurrentWeapon;
+
+    [Tooltip("The muzzle of the gun, where we fire bullets from")]
+    public Transform? Muzzle;
+
+    [Tooltip("Where we place melee weapons / ")]
+    public Transform? WeaponSpawnPoint;
+
+    [Tooltip("Reference to the leading fist transform so we can check if we hit the player")]
+    public Transform? FistTransform;
     
+    [Tooltip("Reference to the collidable component so we can receive hit updates from the player")]
     public Collidable? Collidable;
 
+    [Tooltip("Prefab we create when this dies")]
+    public GameObject? DestroyedPrefab;
+
+    [Tooltip("Layer Masks that are ignored when doing likne of sight raycast")]
+    public LayerMask LineOfSightIgnoreLayers = -1;
+    
     private NavMeshAgent? navMeshAgent;
-    private State currentState = new Unarmed();
+    public Animator? animator { get; private set; }
+    private State currentState;
 
     private void Awake() {
+        animator = GetComponent<Animator>();
         navMeshAgent = GetComponent<NavMeshAgent>();
+
+        if (CurrentWeapon != null) {
+            Debug.Log("Starting FireGunState");
+            currentState = new FireGunState(CurrentWeapon);
+        } else {
+            Debug.Log("Starting UnarmedChaseState");
+            currentState = new UnarmedChaseState(FistTransform!);
+        }
     }
     
     private void Start() {
-        // Make sure we have the right state, we need to set it in the Editor somehow
-        // since I need some form of level editor
-        
         Collidable!.OnHit += OnHit;
+        
+        // since I need some form of level editor
+        currentState.OnEnter(this);
     }
 
     private void Update() {
-        navMeshAgent!.SetDestination(Target.instance!.AimPoint!.position);
+        currentState.OnUpdate(this);
     }
 
-    private void OnHit(Vector3 hitPoint) {
-        Destroy(this.gameObject);
+    private void OnHit(Collidable.Parameters parameters) {
+        if (parameters.isLethal) {
+            ChangeState(new KilledState(parameters.hitPoint));
+        } else {
+            ChangeState(new InterruptedState());
+        }
     }
 
     public void ChangeState(State newState) {
-        currentState.OnExit();
-        newState.OnEnter();
+        currentState.OnExit(this);
+        newState.OnEnter(this);
         currentState = newState;
     }
+
+    public bool HasLineOfSightToTarget() {
+        var target = Target.instance!.AimPoint!.position;
+        
+         Vector3 directionToTarget = (target - Muzzle!.position).normalized;
+        
+        const float fov = 60;
+        bool isInFOV =  Vector3.Angle(Muzzle!.forward, directionToTarget) < fov;
+        
+        if (Physics.Raycast(
+            origin: Muzzle!.position,
+            direction: directionToTarget,
+            out RaycastHit hit,
+            maxDistance: 1000f,
+            layerMask: ~LineOfSightIgnoreLayers
+        )) {
+            if (hit.collider == Target.instance!.TargetCollider) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+
+    public void SetStopped(bool isStopped) {
+        navMeshAgent!.isStopped = isStopped;
+    }
+
+    public void EquipWeapon(Pistol weaponPrefab) {
+        CurrentWeapon = Instantiate(weaponPrefab, WeaponSpawnPoint!);
+        CurrentWeapon.transform.SetPositionAndRotation(WeaponSpawnPoint!.position, WeaponSpawnPoint.rotation);
+    }
+
+    public void DropWeapon() {
+        if (CurrentWeapon == null) {
+            return;
+        }
+        
+        Instantiate(CurrentWeapon.ThrowablePrefab!, WeaponSpawnPoint!.position, WeaponSpawnPoint!.rotation);
+        
+        Destroy(CurrentWeapon.gameObject);
+        CurrentWeapon = null;
+    }
+
 }
