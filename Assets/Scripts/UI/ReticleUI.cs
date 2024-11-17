@@ -31,7 +31,7 @@ public class ReticleUI : MonoBehaviour  {
         ReloadEvent!.ReloadStart += OnReloadStart;
     }
 
-    private void OnHover() {
+    private void OnHover(PickupHoveringEvent.HoverType hoverType) {
         ReticleImage!.enabled = false;
         HoveringImage!.enabled = true;
     }

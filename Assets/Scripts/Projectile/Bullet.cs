@@ -45,6 +45,8 @@ public class Bullet : MonoBehaviour {
         closestHit.distance = Mathf.Infinity;
         bool foundHit = false;
 
+        // TODO: I wonder if technically I should use nonalloc & reuse the same array for this (allocate once in Start)
+        // Sphere cast (should it be a capsule cast? Probably, but depends on projectile)
         Vector3 displacementSinceLastFrame = Tip!.position - lastRootPosition;
         RaycastHit[] hits = Physics.SphereCastAll(
             lastRootPosition,
@@ -87,4 +89,8 @@ public class Bullet : MonoBehaviour {
         Destroy(gameObject);
     }
 
+    private void OnDrawGizmosSelected() {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(Root!.position, Radius);
+    }
 }

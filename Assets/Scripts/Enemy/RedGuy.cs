@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.VFX;
 using Object = UnityEngine.Object;
 
 #nullable enable
@@ -36,7 +37,6 @@ sealed class UnarmedChaseState : State {
         var nearbyWeapon = FindBestNearbyWeapon(redGuy.transform.position);
 
         if (nearbyWeapon != null) {
-            Debug.Log("Found nearby weapon!");
             redGuy.ChangeState(new MoveToPickupState(nearbyWeapon));
             return;
         }
@@ -106,7 +106,7 @@ sealed class UnarmedAttackState : State {
     // Transform of the fist we use to determine whether we hit the player or not
     private readonly Transform fistTransform;
 
-    private const float fistRadius = 0.25f;
+    private const float fistRadius = 0.25f; // TODO: Visualize this
     private const float animationDuration = 0.5f;
     private const float attackCooldown = 1f; // How long we should stay on this state before transitioning away
     private float totalAttackDuration => animationDuration + attackCooldown;
@@ -155,6 +155,7 @@ sealed class UnarmedAttackState : State {
     }
 
     public override void OnExit(RedGuy redGuy) {
+        // Go back to idle I guess? Idk
         redGuy.animator!.Play(AnimationStates.Idle);
     }
 
@@ -204,6 +205,7 @@ sealed class PerformPickupState: State {
     }
     
     public override void OnEnter(RedGuy redGuy) {
+        // TODO: Start the animation
         timeOfAnimStart = Time.time;
     }
     
@@ -296,6 +298,12 @@ sealed class GunFindLineOfSightState: State {
 sealed class InterruptedState : State {
     private const float animationDuration = 0.25f;
     private float timeOfAnimStart;
+
+    private Vector3 hitPoint;
+
+    public InterruptedState(Vector3 hitPoint) {
+        this.hitPoint = hitPoint;
+    }
     
     public override void OnEnter(RedGuy redGuy) {
         timeOfAnimStart = Time.time;
@@ -303,6 +311,8 @@ sealed class InterruptedState : State {
         redGuy.SetStopped(true);
         
         redGuy.DropWeapon();
+        
+        redGuy.PlayDamagedVFX(hitPoint);
     }
     
     public override void OnUpdate(RedGuy redGuy) {
@@ -329,6 +339,8 @@ sealed class KilledState : State {
     public override void OnEnter(RedGuy redGuy) {
         // Start the animation
         // also ragdoll maybe?
+        
+        redGuy.PlayDamagedVFX(hitPoint);
         
         // Drop the weapon
         redGuy.DropWeapon();
@@ -364,6 +376,9 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
     [Tooltip("Prefab we create when this dies")]
     public GameObject? DestroyedPrefab;
 
+    [Tooltip("VFX prefab we create whenever this is hit by something")]
+    public VisualEffect? OnHitVFXPrefab;
+
     [Tooltip("Layer Masks that are ignored when doing likne of sight raycast")]
     public LayerMask LineOfSightIgnoreLayers = -1;
     
@@ -397,7 +412,7 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
         if (parameters.isLethal) {
             ChangeState(new KilledState(parameters.hitPoint));
         } else {
-            ChangeState(new InterruptedState());
+            ChangeState(new InterruptedState(parameters.hitPoint));
         }
     }
 
@@ -419,7 +434,7 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
             origin: Muzzle!.position,
             direction: directionToTarget,
             out RaycastHit hit,
-            maxDistance: 1000f,
+            maxDistance: 1000f, // practically infinite range (doesn't matter b/c small levels)
             layerMask: ~LineOfSightIgnoreLayers
         )) {
             if (hit.collider == Target.instance!.TargetCollider) {

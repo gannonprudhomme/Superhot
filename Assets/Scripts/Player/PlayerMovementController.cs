@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.VFX;
 
 #nullable enable
 
@@ -83,6 +84,9 @@ public class PlayerMovementController : MonoBehaviour  {
         if (characterController!.isGrounded) {
             Vector3 targetVelocity = worldSpaceMove * MaxSpeed;
 
+            // TODO? Idek if I need to do this?
+            // targetVelocity = GetDirectionReorientedOnSlope(targetVelocity.normalized, groundNormal) * targetVelocity.magnitude;
+
             velocity = Vector3.Lerp(
                 velocity,
                 targetVelocity,
@@ -95,12 +99,14 @@ public class PlayerMovementController : MonoBehaviour  {
             float x = Mathf.Lerp(
                 velocity.x,
                 targetVelocity.x,
+                // TODO: consider having an air movement sharpness
                 MovementSharpness * Time.unscaledDeltaTime
             );
 
             float z = Mathf.Lerp(
                 velocity.z,
                 targetVelocity.z,
+                // TODO: consider having an air movement sharpness
                 MovementSharpness * Time.unscaledDeltaTime
             );
 

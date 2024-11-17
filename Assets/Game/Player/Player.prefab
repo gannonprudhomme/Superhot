@@ -278,6 +278,7 @@ GameObject:
   - component: {fileID: 105514105997448444}
   - component: {fileID: 6858655439158312910}
   - component: {fileID: 5217500125791123180}
+  - component: {fileID: 1236902323049105131}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -345,7 +346,7 @@ MonoBehaviour:
   IgnoreHoverCollisionsLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  EquippedWeapon: {fileID: 5361138655831565617}
+  StartingWeapon: {fileID: 5361138655831565617}
   PickupHoveringEvent: {fileID: 11400000, guid: 56e404231e60fc34cbbd477fb8ea41ad, type: 2}
   ReloadEvent: {fileID: 11400000, guid: 0e9deca96b9672749a803b73252c686d, type: 2}
 --- !u!114 &6858655439158312910
@@ -376,6 +377,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Camera: {fileID: 1578631756842526021}
   RotationSpeed: 0.1
+--- !u!95 &1236902323049105131
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4707090414994886930}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &6593993217994790158
 GameObject:
   m_ObjectHideFlags: 0

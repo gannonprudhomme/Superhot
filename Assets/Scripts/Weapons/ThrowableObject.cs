@@ -43,7 +43,7 @@ public class ThrowableObject : MonoBehaviour  {
         
         if (hitCollider.gameObject.TryGetComponent(out Collidable collidable)) {   
             collidable.OnHit?.Invoke(new Collidable.Parameters {
-                hitPoint = hitCollider.GetContact(0).point,
+                hitPoint = hitCollider.GetContact(0).point, // TODO: Idk which we should do, maybe the least one?
                 isLethal = false
             });
             
@@ -75,6 +75,8 @@ public class ThrowableObject : MonoBehaviour  {
             .SetUpdate(UpdateType.Normal, isIndependentUpdate: true); // ignore timescale
 
         rotateTween.onUpdate = () => {
+            // We don't need to stop this because we don't await the rotation tween's completion
+            // though idk if that's necessarily a good idea
             rotateTween.ChangeEndValue(goalTransform.rotation.eulerAngles, snapStartValue: true);
         };
         

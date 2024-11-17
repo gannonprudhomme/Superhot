@@ -1,7 +1,153 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 #nullable enable
+
+public interface PlayerState {
+    public void OnEnter(PlayerController playerController) { }
+    public void OnUpdate(PlayerController playerController) { }
+    public void OnExit(PlayerController playerController) { }
+}
+
+// Aka melee state
+class UnarmedState : PlayerState {
+    private readonly InputAction attackAction = InputSystem.actions.FindAction("Attack");
+
+    // Local state
+    private Collidable? currentAimedAtEnemy = null;
+    private ThrowableObject? currentAimedAtThrowableObject = null;
+
+    public void OnUpdate(PlayerController playerController) {
+        CheckIfAimingAtObjectOrEnemy(playerController);
+
+        if (attackAction.WasPressedThisFrame()) {
+            if (currentAimedAtThrowableObject != null) {
+                playerController.ChangeState(new PickupThrowableObjectState(currentAimedAtThrowableObject));
+                return;
+            } else if (currentAimedAtEnemy != null) {
+                AttemptPunch();
+            }
+        }
+    }
+
+    public void OnExit(PlayerController playerController) {
+        playerController.PickupHoveringEvent!.OnNotHovering?.Invoke();
+    }
+
+    private void CheckIfAimingAtObjectOrEnemy(PlayerController playerController) {
+        // To start, null both out
+        currentAimedAtEnemy = null;
+        currentAimedAtThrowableObject = null;
+        
+        if (!Physics.Raycast(
+            origin: playerController.Camera!.transform.position,
+            direction: playerController.Camera!.transform.forward,
+            out RaycastHit hit,
+            maxDistance: 5f,
+            layerMask: ~playerController.IgnoreHoverCollisionsLayerMask
+        )) {
+            playerController.PickupHoveringEvent!.OnNotHovering?.Invoke();
+            return;
+        }
+
+        if (hit.collider.gameObject.TryGetComponent(out ThrowableParentPointer parentPointer)) {
+            currentAimedAtThrowableObject = parentPointer.Parent;
+            
+            playerController.PickupHoveringEvent!.OnHovering?.Invoke(PickupHoveringEvent.HoverType.THROWABLE);
+            
+        } else if (hit.collider.gameObject.TryGetComponent(out Collidable collidable)) {
+            currentAimedAtEnemy = collidable;
+            
+            playerController.PickupHoveringEvent!.OnHovering?.Invoke(PickupHoveringEvent.HoverType.ENEMY);
+        } else {
+            playerController.PickupHoveringEvent!.OnNotHovering?.Invoke();
+        }
+    }
+}
+
+class PickupThrowableObjectState : PlayerState {
+    private readonly ThrowableObject objectToPickUp;
+    
+    public PickupThrowableObjectState(ThrowableObject objectToPickUp) {
+        this.objectToPickUp = objectToPickUp;
+    }
+    
+    public void OnEnter(PlayerController playerController) {
+        playerController.StartCoroutine(PickupWeapon(playerController));
+    }
+    
+    private IEnumerator PickupWeapon(PlayerController playerController) {
+        if (objectToPickUp.IsBeingPickedUp) {
+            Debug.LogError("Almost picked it up twice!");
+            
+            yield break;
+        }
+        
+        // Animate it coming to the hand
+        yield return objectToPickUp.Pickup(
+            goalTransform: playerController.WeaponSpawnPoint!
+        );
+        
+        // It's done! Actually pick it up
+        
+        Pistol weapon = Object.Instantiate(
+            objectToPickUp.WeaponPrefab!,
+            playerController.WeaponSpawnPoint // We want it to be under the Weapon Spawn Point
+        );
+
+        weapon!.transform.position = playerController.WeaponSpawnPoint!.TransformPoint(Vector3.zero);
+        weapon!.transform.localEulerAngles = Vector3.zero;
+
+        Object.Destroy(objectToPickUp.gameObject);
+        
+        playerController.ChangeState(new GunEquippedState(weapon));
+    }
+} 
+
+class GunEquippedState : PlayerState {
+    private readonly Pistol weapon;
+    private readonly InputAction attackAction;
+    private readonly InputAction throwAction;
+    
+    private const float throwForce = 8_000f; // This makes no sense, why is it so high
+    
+    public GunEquippedState(Pistol weapon) {
+        this.weapon = weapon;
+        attackAction = InputSystem.actions.FindAction("Attack");
+        throwAction = InputSystem.actions.FindAction("Throw");
+    }
+    
+    public void OnUpdate(PlayerController playerController) {
+        if (attackAction.WasPressedThisFrame()) {
+            bool didFire = weapon.FirePressed(playerController.Muzzle!);
+            
+            if (didFire && weapon.RequiresReload) {
+                playerController.ReloadEvent!.ReloadStart?.Invoke(weapon.ReloadDuration);
+            }
+        }
+        
+        if (throwAction.WasPressedThisFrame()) {
+            ThrowWeapon(playerController.Muzzle!);
+            playerController.ChangeState(new UnarmedState());
+        }
+    }
+
+    private void ThrowWeapon(Transform muzzle) {
+        // Spawn a throwable variation of it
+        ThrowableObject throwable = Object.Instantiate(
+            weapon.ThrowablePrefab!,
+            muzzle!.position + (muzzle!.forward * 0.5f), // Move it slightly forward so it doesn't collide w/ the camera
+            weapon!.transform.rotation
+        );
+        
+        Object.Destroy(weapon.gameObject);
+
+        Vector3 force = muzzle!.forward * throwForce; // TODO: This should incorporate the player's velocity
+
+        throwable.Rigidbody!.AddForce(force, ForceMode.Acceleration);
+    }
+}
 
 [RequireComponent(
     typeof(PlayerMovementController),
@@ -21,7 +167,7 @@ public class PlayerController : MonoBehaviour {
     [Tooltip("LayerMask we use to ignore collisions for the pickups, so we only get the hover hitbox")]
     public LayerMask IgnoreHoverCollisionsLayerMask;
     
-    public Pistol? EquippedWeapon; // this will be private & handled by picking up weapons later
+    public Pistol? StartingWeapon;
 
     public PickupHoveringEvent? PickupHoveringEvent;
     public ReloadEvent? ReloadEvent;
@@ -30,122 +176,31 @@ public class PlayerController : MonoBehaviour {
     private InputAction? throwAction;
     private InputAction? pickupAction;
 
-    private ThrowableObject? currentAimedAtThrowableObject = null;
+    #nullable disable // We have to initialize this in Awake due to the InputSystem calls
+    private PlayerState playerState;
+    #nullable enable
 
     private void Awake() {
-        // TODO: Remove this duh
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        
         fireAction = InputSystem.actions.FindAction("Attack");
         throwAction = InputSystem.actions.FindAction("Throw");
+
+        if (StartingWeapon != null) {
+            playerState = new GunEquippedState(StartingWeapon);
+        } else {
+            playerState = new UnarmedState();
+        }
+        
+        playerState.OnEnter(this);
     }
 
     private void Update() {
-        CheckIfAimingAtPickup(); // We intentionally do this before HandleInputs for the pickup
-        
-        HandleInputs();
+        playerState.OnUpdate(this);
     }
 
-    private void HandleInputs() {
-        if (fireAction!.WasPressedThisFrame()) {
-            if (EquippedWeapon != null) {
-                bool didFire = EquippedWeapon.FirePressed(muzzle: Muzzle!);
-                
-                if (didFire && EquippedWeapon.RequiresReload) {
-                    ReloadEvent!.ReloadStart?.Invoke(EquippedWeapon.ReloadDuration);
-                }
-                
-            } else if (currentAimedAtThrowableObject != null) { // Pick up weapon
-                StartCoroutine(PickupObject(currentAimedAtThrowableObject!));
-            }
-        }
-
-        if (fireAction!.WasReleasedThisFrame()) {
-            if (EquippedWeapon != null) {
-                EquippedWeapon.FireReleased();
-            }
-        }
-        
-        if (throwAction!.WasPressedThisFrame()) {
-            AttemptThrowWeapon();
-        }
-    }
-
-    public const float throwForce = 8_000f; // This makes no sense, why is it so high
-    
-    private void AttemptThrowWeapon() {
-        if (EquippedWeapon == null) {
-            return;
-        }
-
-        // Spawn a throwable variation of it
-        ThrowableObject throwable = Instantiate(
-            EquippedWeapon.ThrowablePrefab!,
-            Muzzle!.position + (Muzzle!.forward * 0.5f), // Move it slightly forward so it doesn't collide w/ the camera
-            EquippedWeapon!.transform.rotation
-        );
-        
-        Destroy(EquippedWeapon.gameObject);
-        EquippedWeapon = null;
-
-        Vector3 force = Muzzle!.forward * throwForce; // TODO: This should incorporate the player's velocity
-
-        throwable.Rigidbody!.AddForce(force, ForceMode.Acceleration);
-    }
-
-    private void CheckIfAimingAtPickup() {
-        if (!Physics.Raycast(
-            origin: Camera!.transform.position,
-            direction: Camera!.transform.forward,
-            out RaycastHit hit,
-            maxDistance: 5f,
-            layerMask: ~IgnoreHoverCollisionsLayerMask
-        )) {
-            currentAimedAtThrowableObject = null;
-            PickupHoveringEvent!.OnNotHovering?.Invoke();
-            return;
-        }
-
-        ThrowableObject? throwableHit = null;
-
-        if (hit.collider.gameObject.TryGetComponent(out ThrowableObject throwableObject)) {
-            throwableHit = throwableObject;
-        } else if (hit.collider.gameObject.TryGetComponent(out ThrowableParentPointer parentPointer)) {
-            throwableHit = parentPointer.Parent;
-        }
-        
-        if (throwableHit != null) {
-            currentAimedAtThrowableObject = throwableHit;
-            
-            PickupHoveringEvent!.OnHovering?.Invoke();
-        } else {
-            currentAimedAtThrowableObject = null;
-            
-            PickupHoveringEvent!.OnNotHovering?.Invoke();
-        }
-    }
-
-    private IEnumerator PickupObject(ThrowableObject throwableObject) {
-        if (throwableObject.IsBeingPickedUp) {
-            Debug.Log("Almost picked it up twice!");
-            yield break;
-        }
-        
-        // Animate it coming to the hand
-        yield return throwableObject.Pickup(
-            goalTransform: WeaponSpawnPoint!
-        );
-        
-        EquippedWeapon = Instantiate(
-            throwableObject.WeaponPrefab!,
-            WeaponSpawnPoint
-        );
-
-        EquippedWeapon!.transform.position = WeaponSpawnPoint!.TransformPoint(Vector3.zero);
-        EquippedWeapon!.transform.localEulerAngles = Vector3.zero;
-
-        Destroy(throwableObject.gameObject);
-        currentAimedAtThrowableObject = null;
+    public void ChangeState(PlayerState newState) {
+        // Debug.Log($"Changing state from {playerState} to {newState}");
+        playerState.OnExit(this);
+        newState.OnEnter(this);
+        playerState = newState;
     }
 }

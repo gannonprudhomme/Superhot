@@ -10,7 +10,12 @@ public class LevelManager : MonoBehaviour {
     public string[]? AllLevels;
 
     private Scene? currentLevelScene;
-    
+
+    private void Awake() {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private IEnumerator Start() {
         if (AllLevels == null || AllLevels.Length == 0) {

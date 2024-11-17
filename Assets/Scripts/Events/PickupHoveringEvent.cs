@@ -6,6 +6,12 @@ using UnityEngine.Events;
 // Used for communicating between the PlayerController detecting hover --> the ReticleUI
 [CreateAssetMenu(menuName = "ScriptableObjects/PickupHoveringEvent")]
 public class PickupHoveringEvent : ScriptableObject {
-    public UnityAction? OnHovering;
+    public enum HoverType {
+        THROWABLE, ENEMY
+    }
+    
+    // Honestly we might as well just make this a singleton?
+    
+    public UnityAction<HoverType>? OnHovering;
     public UnityAction? OnNotHovering;
 }
