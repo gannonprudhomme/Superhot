@@ -21,7 +21,11 @@ public class Bullet : MonoBehaviour {
     private const float speed = 20f; 
     private Vector3 velocity = Vector3.zero;
 
+    private float timeOfStart = Mathf.Infinity;
+    private const float Lifetime = 2f; // This shouldn't really matter when we have levels.
+    
     private void Start() {
+        timeOfStart = Time.time;
         velocity = transform.forward * speed;
     }
 

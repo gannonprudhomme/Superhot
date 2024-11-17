@@ -58,6 +58,7 @@ public class PlayerMovementController : MonoBehaviour  {
         // Dynamically changing this makes the forces different based on the time dilation
         // so it seems to need to be fixed
         Time.fixedDeltaTime = 0.02F * MinTimeDilation;
+        VFXManager.fixedTimeStep = 0.02F * MinTimeDilation;
     }
 
     // Update is called once per frame

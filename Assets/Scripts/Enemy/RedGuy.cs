@@ -335,7 +335,7 @@ sealed class KilledState : State {
         
         // Create the destroyed prefab
         var destroyedInstance = Object.Instantiate(redGuy.DestroyedPrefab!, redGuy.transform.position, redGuy.transform.rotation);
-        Object.Destroy(destroyedInstance, 2f); // Destroy after 2 seconds
+        Object.Destroy(destroyedInstance, 5f); // Destroy after 2 seconds
 
         // Delete the actual one
         Object.Destroy(redGuy.gameObject);

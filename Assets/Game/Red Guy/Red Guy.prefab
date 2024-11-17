@@ -227,6 +227,7 @@ MonoBehaviour:
   FistTransform: {fileID: 4545061321952826374}
   Collidable: {fileID: 2240022961368508646}
   DestroyedPrefab: {fileID: 3108830373291015470, guid: 368dea293d3387345af427ca5f4a1434, type: 3}
+  OnHitVFXPrefab: {fileID: 2818405208371967605, guid: 2f809aea341fbc14b861bfa95c75d4be, type: 3}
   LineOfSightIgnoreLayers:
     serializedVersion: 2
     m_Bits: 512
