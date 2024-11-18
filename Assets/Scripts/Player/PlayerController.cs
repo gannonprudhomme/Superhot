@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 struct AnimationStates {
     public const string PunchLeft = "Base Layer.Punch Left";
     public const string PunchRight = "Base Layer.Punch Right";
+    public const string ThrowObject = "Base Layer.Throw Object";
 }
 
 public interface PlayerState {
@@ -24,9 +25,9 @@ class UnarmedState : PlayerState {
     private ThrowableObject? currentAimedAtThrowableObject = null;
     private Vector3 aimedAtPoint = Vector3.zero;
 
-    public bool useLeftPunch = false; // Used to alternate between left & right arms
-    private const float punchAnimationDuration = 0.5f; // TODO: Honestly there's a chance we just ignore this & just use cooldown
-    private const float punchCooldown = 0.25f;
+    private bool useLeftPunch = false; // Used to alternate between left & right arms
+    private const float PunchAnimationDuration = 0.5f; // TODO: Honestly there's a chance we just ignore this & just use cooldown
+    private const float PunchCooldown = 0.25f;
     private float timeOfLastPunch = Mathf.NegativeInfinity;
 
     public void OnUpdate(PlayerController playerController) {
@@ -47,7 +48,7 @@ class UnarmedState : PlayerState {
     }
 
     private void AttemptPunch(Collidable enemyCollidable, PlayerController playerController) {
-        if (Time.time - timeOfLastPunch < (punchCooldown + punchAnimationDuration)) {
+        if (Time.time - timeOfLastPunch < (PunchCooldown + PunchAnimationDuration)) {
             return;
         }
 
@@ -139,7 +140,6 @@ class GunEquippedState : PlayerState {
     private readonly InputAction attackAction;
     private readonly InputAction throwAction;
     
-    private const float throwForce = 8_000f; // This makes no sense, why is it so high
     
     public GunEquippedState(Pistol weapon) {
         this.weapon = weapon;
@@ -157,24 +157,53 @@ class GunEquippedState : PlayerState {
         }
         
         if (throwAction.WasPressedThisFrame()) {
-            ThrowWeapon(playerController.Muzzle!);
-            playerController.ChangeState(new UnarmedState());
+            playerController.ChangeState(new ThrowObjectState(weapon.ThrowablePrefab!, playerController.Muzzle!.rotation));
+            Object.Destroy(weapon.gameObject); // TODO: Ideally ThrowObjectState would do this
         }
     }
+}
 
-    private void ThrowWeapon(Transform muzzle) {
+class ThrowObjectState : PlayerState {
+    private readonly Quaternion initialRotation;
+    private readonly ThrowableObject throwableObjectPrefab;
+    
+    private const float ThrowForce = 8_000f; // This makes no sense, why is it so high
+    
+    public ThrowObjectState(ThrowableObject throwableObjectPrefab, Quaternion initialRotation) {
+        this.throwableObjectPrefab = throwableObjectPrefab;
+        this.initialRotation = initialRotation;
+    }
+    
+    public void OnEnter(PlayerController playerController) {
+        // Play the throw animation
+        // This normalizedTime: 0 is important
+        // without it, if this was the last animation that played, it wouldn't play it again
+        playerController.animator!.Play(AnimationStates.ThrowObject, -1, 0f);
+        
+        CreateAndThrowObject(playerController);
+    }
+
+    public void OnUpdate(PlayerController playerController) {
+        // It doesn't like us changing states in OnEnter, so have to do it here bleh
+        // TODO: Figure out why
+        playerController.ChangeState(new UnarmedState());
+    }
+
+    private void CreateAndThrowObject(PlayerController playerController) {
+        Transform muzzle = playerController.Muzzle!;
+        
         // Spawn a throwable variation of it
-        ThrowableObject throwable = Object.Instantiate(
-            weapon.ThrowablePrefab!,
+        ThrowableObject throwableInstance = Object.Instantiate(
+            throwableObjectPrefab!,
             muzzle!.position + (muzzle!.forward * 0.5f), // Move it slightly forward so it doesn't collide w/ the camera
-            weapon!.transform.rotation
+            initialRotation
         );
         
-        Object.Destroy(weapon.gameObject);
+        throwableInstance.OnThrown();
+        
+        Vector3 force = muzzle!.forward * ThrowForce; // TODO: This should incorporate the player's velocity
 
-        Vector3 force = muzzle!.forward * throwForce; // TODO: This should incorporate the player's velocity
-
-        throwable.Rigidbody!.AddForce(force, ForceMode.Acceleration);
+        throwableInstance.Rigidbody!.AddForce(force, ForceMode.Acceleration);
     }
 }
 
@@ -230,7 +259,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void ChangeState(PlayerState newState) {
-        // Debug.Log($"Changing state from {playerState} to {newState}");
+        // Debug.Log($"Changing player state from {playerState} to {newState}");
         playerState.OnExit(this);
         newState.OnEnter(this);
         playerState = newState;

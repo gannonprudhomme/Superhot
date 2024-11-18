@@ -69,7 +69,7 @@ public class Bullet : MonoBehaviour {
         if (!foundHit) {
             return;
         }
-
+        // Handle case of casting while already inside a collider
         if (closestHit.distance <= 0f) {
             closestHit.point = Root!.position;
             closestHit.normal = -transform.forward;
