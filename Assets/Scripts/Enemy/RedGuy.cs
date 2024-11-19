@@ -55,6 +55,8 @@ sealed class UnarmedChaseState : State {
     }
 
     private ThrowableObject? FindBestNearbyWeapon(Vector3 position) {
+        // TOOD: We only want to pick up weapons - not basic throwables like bottles, etc
+
         Collider[] foundColliders = new Collider[5];
         
         int foundCount = Physics.OverlapSphereNonAlloc(
@@ -87,7 +89,7 @@ sealed class UnarmedChaseState : State {
                 continue;
             }
 
-            bool isActualWeapon = true;
+            bool isActualWeapon = true; // TODO: Need to check if it's n "actual" weapon
 
             float dist = Vector3.Distance(position, foundThrowableObject.transform.position);
 
@@ -240,18 +242,17 @@ sealed class FireGunState : State {
     }
     
     public override void OnEnter(RedGuy redGuy) {
-        // Maybe do an animation to show the gun?
-        redGuy.SetCanOnlyRotate(true);
+        // TODO: Maybe do an animation to equip the gun?
+        redGuy.DisablePathfinding();
     }
 
     public override void OnUpdate(RedGuy redGuy) {
         // TODO: Might need to make sure the pickup gun animation is done?
         
-        // When they have a gun do they strafe? I dont' think they do
+        // When they have a gun do they strafe? I don't think they do
         // For now just assume no
 
         if (!redGuy.HasLineOfSightToTarget()) {
-            Debug.Log("No line of sight in fire gun");
             // We don't have line of sight anymore
             redGuy.ChangeState(new GunFindLineOfSightState(gun, Target.instance));
             return;
@@ -264,11 +265,10 @@ sealed class FireGunState : State {
         
         gun.FireIfPossible(redGuy.Muzzle!.position, direction);
     }
-    
-    public override void OnExit(RedGuy redGuy) {
-        redGuy.SetCanOnlyRotate(false);
-    }
 }
+
+// We have a gun equipped, and want to find line of sight as soon as we can
+// once we do, we'll switch to the Fire state
 sealed class GunFindLineOfSightState: State {
     private readonly Pistol gun;
     private readonly Target target;
@@ -308,9 +308,15 @@ sealed class InterruptedState : State {
     public override void OnEnter(RedGuy redGuy) {
         timeOfAnimStart = Time.time;
         
-        redGuy.SetStopped(true);
+        // TODO: Play the "flinch" animation
         
+        redGuy.DisablePathfinding();
+        
+        // drop the weapon, if we have one equipped
         redGuy.DropWeapon();
+        
+        // Should I do the health check in here or in RedGuy?
+        redGuy.TakeDamage(hitPoint);
         
         redGuy.PlayDamagedVFX(hitPoint);
     }
@@ -323,14 +329,10 @@ sealed class InterruptedState : State {
         
         redGuy.ChangeState(new UnarmedChaseState(redGuy.FistTransform!));
     }
-
-    public override void OnExit(RedGuy redGuy) {
-        redGuy.SetStopped(false);
-    }
 }
 
 sealed class KilledState : State {
-    private Vector3 hitPoint;
+    private readonly Vector3 hitPoint;
     
     public KilledState(Vector3 hitPoint) {
         this.hitPoint = hitPoint;
@@ -379,8 +381,8 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
     [Tooltip("VFX prefab we create whenever this is hit by something")]
     public VisualEffect? OnHitVFXPrefab;
 
-    [Tooltip("Layer Masks that are ignored when doing likne of sight raycast")]
-    public LayerMask LineOfSightIgnoreLayers = -1;
+    // It takes 3-4 hits (melee or thrown objects) to kill
+    private int health = 3;
     
     private NavMeshAgent? navMeshAgent;
     public Animator? animator { get; private set; }
@@ -427,15 +429,19 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
         
          Vector3 directionToTarget = (target - Muzzle!.position).normalized;
         
-        const float fov = 60;
+        const float fov = 45;
         bool isInFOV =  Vector3.Angle(Muzzle!.forward, directionToTarget) < fov;
+        
+        if (!isInFOV) {
+            return false;
+        }
         
         if (Physics.Raycast(
             origin: Muzzle!.position,
             direction: directionToTarget,
             out RaycastHit hit,
             maxDistance: 1000f, // practically infinite range (doesn't matter b/c small levels)
-            layerMask: ~LineOfSightIgnoreLayers
+            layerMask: -1 // Don't think we can want to ignore anything
         )) {
             if (hit.collider == Target.instance!.TargetCollider) {
                 return true;
@@ -449,9 +455,14 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
         navMeshAgent!.SetDestination(destination);
     }
     
-
-    public void SetStopped(bool isStopped) {
-        navMeshAgent!.isStopped = isStopped;
+    public void RotateTowards(Vector3 position) {
+        Vector3 direction = (position - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+    }
+    
+    public void DisablePathfinding() {
+        navMeshAgent!.ResetPath();;
     }
 
     public void EquipWeapon(Pistol weaponPrefab) {

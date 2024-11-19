@@ -110,7 +110,7 @@ class PickupThrowableObjectState : PlayerState {
     private IEnumerator PickupWeapon(PlayerController playerController) {
         if (objectToPickUp.IsBeingPickedUp) {
             Debug.LogError("Almost picked it up twice!");
-            
+            // TODO: I think we need to move back to UnarmedState in this case
             yield break;
         }
         
@@ -131,6 +131,7 @@ class PickupThrowableObjectState : PlayerState {
 
         Object.Destroy(objectToPickUp.gameObject);
         
+        // TODO: Based on what type of object this is, move to the according state
         playerController.ChangeState(new GunEquippedState(weapon));
     }
 } 
@@ -226,6 +227,8 @@ public class PlayerController : MonoBehaviour {
     [Tooltip("LayerMask we use to ignore collisions for the pickups, so we only get the hover hitbox")]
     public LayerMask IgnoreHoverCollisionsLayerMask;
     
+    // TODO: Honestly this should just be an enum?
+    // though I don't think we ever start with a weapon?
     public Pistol? StartingWeapon;
 
     public PickupHoveringEvent? PickupHoveringEvent;
