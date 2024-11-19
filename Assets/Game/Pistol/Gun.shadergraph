@@ -46,7 +46,11 @@
         }
     ],
     "m_GroupDatas": [],
-    "m_StickyNoteDatas": [],
+    "m_StickyNoteDatas": [
+        {
+            "m_Id": "e21cf2d49d2a4263ac9669dbd6b1799e"
+        }
+    ],
     "m_Edges": [],
     "m_VertexContext": {
         "m_Position": {
@@ -75,6 +79,9 @@
                 "m_Id": "1c561e0a5587494b89c6e215609e8d35"
             },
             {
+                "m_Id": "5a5fc7f97dfa4ec7ab1755a5201f672a"
+            },
+            {
                 "m_Id": "7bcd9d3b61be4dad8e01b93072b3323f"
             },
             {
@@ -91,9 +98,6 @@
             },
             {
                 "m_Id": "f4b5749be34342ab97170850ffdbbbfa"
-            },
-            {
-                "m_Id": "5a5fc7f97dfa4ec7ab1755a5201f672a"
             }
         ]
     },
@@ -407,10 +411,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 0.0,
-            "height": 0.0
+            "x": 12.999982833862305,
+            "y": 272.0,
+            "width": 200.00003051757813,
+            "height": 41.0
         }
     },
     "m_Slots": [
@@ -715,6 +719,26 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.StickyNoteData",
+    "m_ObjectId": "e21cf2d49d2a4263ac9669dbd6b1799e",
+    "m_Title": "",
+    "m_Content": "Note: I made this transparent - even though it's not transparent - so it doesn't get written to the depth buffer",
+    "m_TextSize": 0,
+    "m_Theme": 0,
+    "m_Position": {
+        "serializedVersion": "2",
+        "x": -353.0,
+        "y": 230.0,
+        "width": 200.0,
+        "height": 160.0
+    },
+    "m_Group": {
+        "m_Id": ""
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.PositionMaterialSlot",
     "m_ObjectId": "e6840ab7cb7b4e8c8ec6caf3e41dc875",
     "m_Id": 0,
@@ -824,8 +848,8 @@
     "m_Type": "UnityEditor.Rendering.HighDefinition.ShaderGraph.SystemData",
     "m_ObjectId": "f52dcb8f80cf4e198f8acff8eb0d6236",
     "m_MaterialNeedsUpdateHash": 0,
-    "m_SurfaceType": 0,
-    "m_RenderingPass": 1,
+    "m_SurfaceType": 1,
+    "m_RenderingPass": 4,
     "m_BlendMode": 0,
     "m_ZTest": 4,
     "m_ZWrite": false,
@@ -850,6 +874,6 @@
     "m_TessellationMaxDisplacement": 0.009999999776482582,
     "m_DebugSymbols": false,
     "m_Version": 2,
-    "inspectorFoldoutMask": 0
+    "inspectorFoldoutMask": 9
 }
 
