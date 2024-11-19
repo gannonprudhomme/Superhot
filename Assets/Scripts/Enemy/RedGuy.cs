@@ -15,10 +15,10 @@ struct AnimationStates {
 // but the attack state probably needs to influence the movement state
 // e.g. we should charge if we have a melee weapon, but might not want to with a gun
 // and if we're unarmed we need to go find a weapon (and/or charge) - this might be simpler though
-public abstract class State {
-    public virtual void OnEnter(RedGuy redGuy) { }
-    public virtual void OnUpdate(RedGuy redGuy) { }
-    public virtual void OnExit(RedGuy redGuy) { }
+public interface State {
+    public void OnEnter(RedGuy redGuy) { }
+    public void OnUpdate(RedGuy redGuy) { }
+    public void OnExit(RedGuy redGuy) { }
 }
 
 // Don't want this to be public? Just for this file
@@ -32,7 +32,7 @@ sealed class UnarmedChaseState : State {
         this.fistTransform = fistTransform;
     }
     
-    public override void OnUpdate(RedGuy redGuy) {
+    public void OnUpdate(RedGuy redGuy) {
         // See if there's a weapon nearby
         var nearbyWeapon = FindBestNearbyWeapon(redGuy.transform.position);
 
@@ -71,6 +71,8 @@ sealed class UnarmedChaseState : State {
         }
         
         ThrowableObject? closestWeapon = null;
+        // TODO: Really this should be how long is the path to it, rather than just the distance between the points
+        // so worth considering improving this
         int closestDistance = int.MaxValue;
         
         foreach (var collider in foundColliders) {
@@ -120,7 +122,7 @@ sealed class UnarmedAttackState : State {
         this.fistTransform = fistTransform;
     }
     
-    public override void OnEnter(RedGuy redGuy) {
+    public void OnEnter(RedGuy redGuy) {
         timeOfAttackStart = Time.time;
 
         // Start the animation
@@ -128,7 +130,7 @@ sealed class UnarmedAttackState : State {
         redGuy.animator!.Play(AnimationStates.Melee);
     }
 
-    public override void OnUpdate(RedGuy redGuy) {
+    public void OnUpdate(RedGuy redGuy) {
         float timeSinceStart = Time.time - timeOfAttackStart;
         if (timeSinceStart > totalAttackDuration) {
             redGuy.ChangeState(new UnarmedChaseState(fistTransform));
@@ -156,7 +158,7 @@ sealed class UnarmedAttackState : State {
         }
     }
 
-    public override void OnExit(RedGuy redGuy) {
+    public void OnExit(RedGuy redGuy) {
         // Go back to idle I guess? Idk
         redGuy.animator!.Play(AnimationStates.Idle);
     }
@@ -173,13 +175,13 @@ sealed class MoveToPickupState : State {
         this.objectToPickUp = toPickUp;
     }
     
-    public override void OnEnter(RedGuy redGuy) {
+    public void OnEnter(RedGuy redGuy) {
         redGuy.SetDestination(objectToPickUp.transform.position);
     }
 
     private const float pickupDistance = 1f;
 
-    public override void OnUpdate(RedGuy redGuy) {
+    public void OnUpdate(RedGuy redGuy) {
         if (objectToPickUp == null) {
             Debug.Log("Can't pick up object, it was destroyed");
             // Go back, attempt to find a new one / etc
@@ -206,12 +208,12 @@ sealed class PerformPickupState: State {
         this.objectToPickUp = toPickUp;
     }
     
-    public override void OnEnter(RedGuy redGuy) {
+    public void OnEnter(RedGuy redGuy) {
         // TODO: Start the animation
         timeOfAnimStart = Time.time;
     }
     
-    public override void OnUpdate(RedGuy redGuy) {
+    public void OnUpdate(RedGuy redGuy) {
         if (objectToPickUp == null) {
             Debug.Log("Can't pick up object, it was destroyed");
             // Go back, attempt to find a new one / etc
@@ -241,12 +243,12 @@ sealed class FireGunState : State {
         this.gun = gun;
     }
     
-    public override void OnEnter(RedGuy redGuy) {
+    public void OnEnter(RedGuy redGuy) {
         // TODO: Maybe do an animation to equip the gun?
         redGuy.DisablePathfinding();
     }
 
-    public override void OnUpdate(RedGuy redGuy) {
+    public void OnUpdate(RedGuy redGuy) {
         // TODO: Might need to make sure the pickup gun animation is done?
         
         // When they have a gun do they strafe? I don't think they do
@@ -278,11 +280,11 @@ sealed class GunFindLineOfSightState: State {
         this.target = target;
     }
 
-    public override void OnEnter(RedGuy redGuy) {
+    public void OnEnter(RedGuy redGuy) {
         redGuy.SetDestination(target.AimPoint!.position);
     }
     
-    public override void OnUpdate(RedGuy redGuy) {
+    public void OnUpdate(RedGuy redGuy) {
         // As soon as we have line of sight, we should fire
         if (redGuy.HasLineOfSightToTarget()) {
             redGuy.ChangeState(new FireGunState(gun));
@@ -305,7 +307,7 @@ sealed class InterruptedState : State {
         this.hitPoint = hitPoint;
     }
     
-    public override void OnEnter(RedGuy redGuy) {
+    public void OnEnter(RedGuy redGuy) {
         timeOfAnimStart = Time.time;
         
         // TODO: Play the "flinch" animation
@@ -321,7 +323,7 @@ sealed class InterruptedState : State {
         redGuy.PlayDamagedVFX(hitPoint);
     }
     
-    public override void OnUpdate(RedGuy redGuy) {
+    public void OnUpdate(RedGuy redGuy) {
         bool readyToResume = Time.time - timeOfAnimStart < animationDuration;
         if (!readyToResume) {
             return;
@@ -338,7 +340,7 @@ sealed class KilledState : State {
         this.hitPoint = hitPoint;
     }
     
-    public override void OnEnter(RedGuy redGuy) {
+    public void OnEnter(RedGuy redGuy) {
         // Start the animation
         // also ragdoll maybe?
         
