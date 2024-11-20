@@ -5,10 +5,11 @@ using UnityEngine.InputSystem;
 #nullable enable
 
 struct AnimationStates {
+    public const string Idle = "Base Layer.Idle";
     public const string PunchLeft = "Base Layer.Punch Left";
     public const string PunchRight = "Base Layer.Punch Right";
     public const string ThrowObject = "Base Layer.Throw Object";
-    public const string Idle = "Base Layer.Idle";
+    public const string ShootPistol = "Base Layer.Shoot Pistol";
 }
 
 public interface PlayerState {
@@ -157,18 +158,33 @@ class GunEquippedState : PlayerState {
     
     public void OnUpdate(PlayerController playerController) {
         if (attackAction.WasPressedThisFrame()) {
-            bool didFire = weapon.FirePressed(playerController.Muzzle!);
+            if (weapon.IsOutOfAmmo) {
+                // TODO: Show the "YOU'RE OUT" text (it changes)
+                // TODO: I think play a half-shoot animation?
+                // then on next fire (LMB pressed, not RMB), throw the weapon
+                // For now I'm just going to throw it immediately
+                playerController.ChangeState(new ThrowObjectState(weapon.ThrowablePrefab!, playerController.Muzzle!.rotation, weapon.gameObject));
+                return;
+            }
             
-            if (didFire && weapon.RequiresReload) {
+            bool didFire = weapon.FirePressed(playerController.Muzzle!);
+
+            if (didFire) {
                 playerController.timeDilation!.ForceTimeDilation();
                 
-                playerController.ReloadEvent!.ReloadStart?.Invoke(weapon.ReloadDuration);
+                // This normalizedTime: 0 is important - without it, if this was the last animation that played, it wouldn't play it again
+                playerController!.animator!.Play(AnimationStates.ShootPistol, -1, 0f);
+                
+                // Not all weapons require a reload
+                if (weapon.RequiresReload) {
+                    playerController.ReloadEvent!.ReloadStart?.Invoke(weapon.ReloadDuration);
+                }
             }
         }
         
+        // Should this be an else-if?
         if (throwAction.WasPressedThisFrame()) {
-            playerController.ChangeState(new ThrowObjectState(weapon.ThrowablePrefab!, playerController.Muzzle!.rotation));
-            Object.Destroy(weapon.gameObject); // TODO: Ideally ThrowObjectState would do this
+            playerController.ChangeState(new ThrowObjectState(weapon.ThrowablePrefab!, playerController.Muzzle!.rotation, weapon.gameObject));
         }
     }
 }
@@ -176,15 +192,19 @@ class GunEquippedState : PlayerState {
 class ThrowObjectState : PlayerState {
     private readonly Quaternion initialRotation;
     private readonly ThrowableObject throwableObjectPrefab;
+    private readonly GameObject originalWeapon;
     
     private const float ThrowForce = 8_000f * 2f; // This makes no sense, why is it so high
     
-    public ThrowObjectState(ThrowableObject throwableObjectPrefab, Quaternion initialRotation) {
+    public ThrowObjectState(ThrowableObject throwableObjectPrefab, Quaternion initialRotation, GameObject originalWeapon) {
         this.throwableObjectPrefab = throwableObjectPrefab;
         this.initialRotation = initialRotation;
+        this.originalWeapon = originalWeapon;
     }
     
     public void OnEnter(PlayerController playerController) {
+        Object.Destroy(originalWeapon);
+        
         // Play the throw animation
         // This normalizedTime: 0 is important
         // without it, if this was the last animation that played, it wouldn't play it again

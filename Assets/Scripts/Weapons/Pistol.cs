@@ -25,13 +25,26 @@ public sealed class Pistol : MonoBehaviour, Weapon {
     public ThrowableObject? _ThrowablePrefab;
     
     public ThrowableObject? ThrowablePrefab => _ThrowablePrefab!;
+
+    private const float StartingAmmo = 5;
+    private float ammoCount = StartingAmmo;
     
     public float ReloadDuration => 1f; // 1 shot per second
     public bool RequiresReload => true;
 
     private float lastTimeFired = Mathf.NegativeInfinity;
     
+    public bool IsOutOfAmmo => ammoCount <= 0;
+    
     public bool FirePressed(Transform muzzle) {
+        if (IsOutOfAmmo) {
+            Debug.LogError("Calling fire when we're out of ammo - this shouldn't ever happen");
+            return false;
+        }
+        
+        // Give enemies infinite ammo / only subtract for the player
+        // though idk if they actually have infinite ammo
+        ammoCount -= 1;
         return FireIfPossible(muzzle.position, muzzle.forward);
     }
     

@@ -32,7 +32,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 396000932328867625}
+  - {fileID: 6649760394461742316}
   - {fileID: 4114076202807892538}
   - {fileID: 6230827071586667623}
   m_Father: {fileID: 1609865032141817035}
@@ -472,6 +472,38 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &4918969901103946720
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6649760394461742316}
+  m_Layer: 8
+  m_Name: Pistol Pivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6649760394461742316
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4918969901103946720}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.08356048, y: -0.034722313, z: 0.023632111, w: 0.9956172}
+  m_LocalPosition: {x: 0.40735033, y: -1.1349021, z: 0.5801416}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 396000932328867625}
+  m_Father: {fileID: 1558997127019655004}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6593993217994790158
 GameObject:
   m_ObjectHideFlags: 0
@@ -496,13 +528,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6593993217994790158}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.08356048, y: -0.034722313, z: 0.023632111, w: 0.9956172}
-  m_LocalPosition: {x: 0.407, y: -0.83, z: 1.32}
+  m_LocalRotation: {x: -0, y: -0, z: -6.984919e-10, w: 1}
+  m_LocalPosition: {x: 0.06400001, y: 0.17600007, z: 0.778}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1073980078877822047}
-  m_Father: {fileID: 1558997127019655004}
+  m_Father: {fileID: 6649760394461742316}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7283885161713886829
 GameObject:
@@ -569,15 +601,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3516607961778349827, guid: c66d4c4a74caa9c44909b26997d27ffc, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3516607961778349827, guid: c66d4c4a74caa9c44909b26997d27ffc, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3516607961778349827, guid: c66d4c4a74caa9c44909b26997d27ffc, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3516607961778349827, guid: c66d4c4a74caa9c44909b26997d27ffc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
