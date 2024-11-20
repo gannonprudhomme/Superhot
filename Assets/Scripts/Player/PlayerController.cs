@@ -10,6 +10,7 @@ struct AnimationStates {
     public const string PunchRight = "Base Layer.Punch Right";
     public const string ThrowObject = "Base Layer.Throw Object";
     public const string ShootPistol = "Base Layer.Shoot Pistol";
+    public const string PickupObject = "Base Layer.Pickup Object";
 }
 
 public interface PlayerState {
@@ -39,6 +40,8 @@ class UnarmedState : PlayerState {
                 playerController.ChangeState(new PickupThrowableObjectState(currentAimedAtThrowableObject));
                 return;
             } else if (currentAimedAtCollidable != null) {
+                // TODO: This should just be its own state probably
+                // well actually it would need to be able to interrupt itself, hrmmmmmm
                 AttemptPunch(currentAimedAtCollidable, playerController);
             }
         }
@@ -111,7 +114,7 @@ class PickupThrowableObjectState : PlayerState {
     
     public void OnEnter(PlayerController playerController) {
         playerController.StartCoroutine(PickupWeapon(playerController));
-        playerController.animator!.Play(AnimationStates.Idle); // This will be an actual pickup animation soon
+        playerController.animator!.Play(AnimationStates.PickupObject); // This will be an actual pickup animation soon
     }
     
     private IEnumerator PickupWeapon(PlayerController playerController) {
