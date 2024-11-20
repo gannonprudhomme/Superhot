@@ -15,6 +15,8 @@ public class Bullet : MonoBehaviour {
 
     [Tooltip("Layers this projectile can hit")] // Should be all for now
     public LayerMask HittableLayers = -1;
+
+    public ForceArea? ForceArePrefab;
     
     private Vector3 lastRootPosition = Vector3.negativeInfinity;
 
@@ -76,6 +78,10 @@ public class Bullet : MonoBehaviour {
         }
 
         OnHit(closestHit.point, closestHit.normal, closestHit.collider);
+        
+        if (ForceArePrefab != null) {
+            Instantiate(ForceArePrefab, closestHit.point, transform.rotation);
+        }
     }
 
     private void OnHit(Vector3 point, Vector3 normal, Collider hitCollider) {

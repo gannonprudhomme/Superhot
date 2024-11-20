@@ -59,6 +59,9 @@ class UnarmedState : PlayerState {
         // Damage the collidable (enemy) we're aiming at *immediately*
         enemyCollidable.OnHit?.Invoke(new Collidable.Parameters() { hitPoint = aimedAtPoint, isLethal = false });
 
+        // Create the force area
+        Object.Instantiate(playerController.ForceAreaPrefab!, aimedAtPoint, playerController.Muzzle!.rotation);
+
         playerController.animator!.Play(useLeftPunch ? AnimationStates.PunchLeft : AnimationStates.PunchRight);
         useLeftPunch = !useLeftPunch; // Invert it
     }
@@ -235,6 +238,8 @@ public class PlayerController : MonoBehaviour {
     
     [Tooltip("LayerMask we use to ignore collisions for the pickups, so we only get the hover hitbox")]
     public LayerMask IgnoreHoverCollisionsLayerMask;
+
+    public ForceArea? ForceAreaPrefab;
     
     // TODO: Honestly this should just be an enum?
     // though I don't think we ever start with a weapon?

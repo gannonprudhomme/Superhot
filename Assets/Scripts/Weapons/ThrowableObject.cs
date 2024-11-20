@@ -21,6 +21,9 @@ public class ThrowableObject : MonoBehaviour  {
 
     [Tooltip("Prefab that is created when this object is destroyed")]
     public GameObject? DestructedPrefab;
+
+    [Tooltip("Prefab that is created when this object hits something")]
+    public ForceArea? ForceAreaPrefab;
     
     public bool IsBeingPickedUp => moveTween != null || rotateTween != null;
 
@@ -48,6 +51,9 @@ public class ThrowableObject : MonoBehaviour  {
                 hitPoint = hitCollider.GetContact(0).point, // TODO: Idk which we should do, maybe the least one?
                 isLethal = false
             });
+            
+            var forceArea = Instantiate(ForceAreaPrefab!, hitCollider.GetContact(0).point, transform.rotation);
+            forceArea.Force /= 2f;
             
             GameObject destructedObject = Instantiate(DestructedPrefab!, transform.position, transform.rotation);
             Destroy(destructedObject, 5f);

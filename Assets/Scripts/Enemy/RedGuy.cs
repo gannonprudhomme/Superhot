@@ -221,7 +221,7 @@ sealed class PerformPickupState: State {
             return;
         }
         
-        bool readyToPickUp = Time.time - timeOfAnimStart < animationDuration;
+        bool readyToPickUp = Time.time - timeOfAnimStart > animationDuration;
         if (!readyToPickUp) {
             return;
         }
@@ -298,8 +298,8 @@ sealed class GunFindLineOfSightState: State {
 
 // Transitioned to when we get hit, but not killed
 sealed class InterruptedState : State {
-    private const float animationDuration = 0.75f;
-    private float timeOfAnimStart;
+    private const float animationDuration = 0.5f;
+    private float unscaledTimeOfAnimStart;
 
     private Vector3 hitPoint;
 
@@ -308,11 +308,11 @@ sealed class InterruptedState : State {
     }
     
     public void OnEnter(RedGuy redGuy) {
-        timeOfAnimStart = Time.time;
+        unscaledTimeOfAnimStart = Time.unscaledTime;
         
         // TODO: Play the "flinch" animation
         
-        redGuy.DisablePathfinding();
+        redGuy.EnablePhysics();
         
         // drop the weapon, if we have one equipped
         redGuy.DropWeapon();
@@ -324,12 +324,16 @@ sealed class InterruptedState : State {
     }
     
     public void OnUpdate(RedGuy redGuy) {
-        bool readyToResume = Time.time - timeOfAnimStart < animationDuration;
+        bool readyToResume = Time.unscaledTime - unscaledTimeOfAnimStart > animationDuration;
         if (!readyToResume) {
             return;
         }
         
         redGuy.ChangeState(new UnarmedChaseState(redGuy.FistTransform!));
+    }
+    
+    public void OnExit(RedGuy redGuy) {
+        redGuy.DisablePhysics();
     }
 }
 
@@ -360,7 +364,8 @@ sealed class KilledState : State {
 
 [RequireComponent(
     typeof(NavMeshAgent),
-    typeof(Animator)
+    typeof(Animator),
+    typeof(Rigidbody)
 )]
 public class RedGuy : MonoBehaviour { // TODO: I might as well just call this Enemy
     public Pistol? CurrentWeapon;
@@ -388,11 +393,13 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
     
     private NavMeshAgent? navMeshAgent;
     public Animator? animator { get; private set; }
+    private Rigidbody? rigidbody;
     private State currentState;
 
     private void Awake() {
         animator = GetComponent<Animator>();
         navMeshAgent = GetComponent<NavMeshAgent>();
+        rigidbody = GetComponent<Rigidbody>();
 
         if (CurrentWeapon != null) {
             currentState = new FireGunState(CurrentWeapon);
@@ -402,6 +409,9 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
     }
     
     private void Start() {
+        var rigidBodyCollidable = GetComponent<Collidable>();
+        rigidBodyCollidable!.OnHit += OnHit;
+        
         Collidable!.OnHit += OnHit;
         
         // since I need some form of level editor
@@ -464,7 +474,19 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
     }
     
     public void DisablePathfinding() {
+        // Probably just change this to:
+        // navMeshAgent!.enabled = false;
         navMeshAgent!.ResetPath();;
+    }
+
+    public void EnablePhysics() {
+        navMeshAgent!.enabled = false;
+        rigidbody!.isKinematic = false;
+    }
+
+    public void DisablePhysics() {
+        navMeshAgent!.enabled = true;
+        rigidbody!.isKinematic = true;
     }
 
     public void EquipWeapon(Pistol weaponPrefab) {

@@ -285,6 +285,7 @@ MonoBehaviour:
   HittableLayers:
     serializedVersion: 2
     m_Bits: 823
+  ForceArePrefab: {fileID: 1764800929557540628, guid: cc5cb2ef6a7376d4eb0bd4ecc38b95d1, type: 3}
 --- !u!54 &7433559752837390614
 Rigidbody:
   m_ObjectHideFlags: 0

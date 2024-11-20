@@ -184,6 +184,8 @@ GameObject:
   - component: {fileID: -6922351180853819600}
   - component: {fileID: 5652606821693855857}
   - component: {fileID: 452402291588568180}
+  - component: {fileID: 4767955271721059226}
+  - component: {fileID: 3539961949809403738}
   m_Layer: 9
   m_Name: Red Guy
   m_TagString: Untagged
@@ -225,12 +227,9 @@ MonoBehaviour:
   Muzzle: {fileID: 4526687109054210066}
   WeaponSpawnPoint: {fileID: 2542194869398986860}
   FistTransform: {fileID: 4545061321952826374}
-  Collidable: {fileID: 2240022961368508646}
+  Collidable: {fileID: 6555407978028424790}
   DestroyedPrefab: {fileID: 3108830373291015470, guid: 368dea293d3387345af427ca5f4a1434, type: 3}
   OnHitVFXPrefab: {fileID: 2818405208371967605, guid: 2f809aea341fbc14b861bfa95c75d4be, type: 3}
-  LineOfSightIgnoreLayers:
-    serializedVersion: 2
-    m_Bits: 512
 --- !u!195 &5652606821693855857
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -275,6 +274,45 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!54 &4767955271721059226
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5944466225402746086}
+  serializedVersion: 4
+  m_Mass: 5
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &3539961949809403738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5944466225402746086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab7a141f410532d4d91b93081093ee72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7033990468571458764
 GameObject:
   m_ObjectHideFlags: 0
@@ -407,7 +445,7 @@ PrefabInstance:
       addedObject: {fileID: 1416986266954760085}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 987bf8344837f8048b6806f1b6e1c3ec, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2240022961368508646}
+      addedObject: {fileID: 6555407978028424790}
   m_SourcePrefab: {fileID: 100100000, guid: 987bf8344837f8048b6806f1b6e1c3ec, type: 3}
 --- !u!4 &2330804795490221618 stripped
 Transform:
@@ -440,7 +478,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.95430917, y: 0.9543093, z: 3.6742768}
   m_Center: {x: 0, y: 0, z: 1.8327997}
---- !u!114 &2240022961368508646
+--- !u!114 &6555407978028424790
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

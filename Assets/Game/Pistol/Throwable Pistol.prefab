@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WeaponPrefab: {fileID: 8380244864464621165, guid: c66d4c4a74caa9c44909b26997d27ffc, type: 3}
   DestructedPrefab: {fileID: 4852234684601179180, guid: f9c621e9707a2b944afa0d64845cae63, type: 3}
+  ForceAreaPrefab: {fileID: 1764800929557540628, guid: cc5cb2ef6a7376d4eb0bd4ecc38b95d1, type: 3}
 --- !u!54 &2862287114306993237
 Rigidbody:
   m_ObjectHideFlags: 0

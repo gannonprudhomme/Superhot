@@ -21,8 +21,9 @@ public class PlayerMovementController : MonoBehaviour  {
     private InputAction? lookAction;
     public CharacterController? characterController;
     
-    private const float MaxSpeed = 10f;
-    private const float MovementSharpness = 5f;
+    public const float MaxSpeed = 10f;
+    private const float DecelerationMovementSharpness = 20f;
+    private const float MovementSharpness = 2f;
     
     private float verticalCameraAngle = 0f;
     public Vector3 Velocity { get; private set; } = Vector3.zero;
@@ -68,7 +69,7 @@ public class PlayerMovementController : MonoBehaviour  {
                 Velocity,
                 targetVelocity,
                 // Don't want timeScale to affect this - that's just another thing we'd have to factor in
-                MovementSharpness * Time.deltaTime
+                movementSharpness * Time.unscaledDeltaTime
             );
         } else {
             Vector3 targetVelocity = worldSpaceMove * MaxSpeed;
