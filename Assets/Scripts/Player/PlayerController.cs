@@ -8,6 +8,7 @@ struct AnimationStates {
     public const string PunchLeft = "Base Layer.Punch Left";
     public const string PunchRight = "Base Layer.Punch Right";
     public const string ThrowObject = "Base Layer.Throw Object";
+    public const string Idle = "Base Layer.Idle";
 }
 
 public interface PlayerState {
@@ -26,8 +27,7 @@ class UnarmedState : PlayerState {
     private Vector3 aimedAtPoint = Vector3.zero;
 
     private bool useLeftPunch = false; // Used to alternate between left & right arms
-    private const float PunchAnimationDuration = 0.5f; // TODO: Honestly there's a chance we just ignore this & just use cooldown
-    private const float PunchCooldown = 0.25f;
+    private const float PunchCooldown = 0.2f;
     private float timeOfLastPunch = Mathf.NegativeInfinity;
 
     public void OnUpdate(PlayerController playerController) {
@@ -48,9 +48,11 @@ class UnarmedState : PlayerState {
     }
 
     private void AttemptPunch(Collidable enemyCollidable, PlayerController playerController) {
-        if (Time.time - timeOfLastPunch < (PunchCooldown + PunchAnimationDuration)) {
+        if (Time.time - timeOfLastPunch < (PunchCooldown)) {
             return;
         }
+        
+        playerController.timeDilation!.ForceTimeDilation();
 
         timeOfLastPunch = Time.time;
         
@@ -105,6 +107,7 @@ class PickupThrowableObjectState : PlayerState {
     
     public void OnEnter(PlayerController playerController) {
         playerController.StartCoroutine(PickupWeapon(playerController));
+        playerController.animator!.Play(AnimationStates.Idle); // This will be an actual pickup animation soon
     }
     
     private IEnumerator PickupWeapon(PlayerController playerController) {
@@ -113,6 +116,8 @@ class PickupThrowableObjectState : PlayerState {
             // TODO: I think we need to move back to UnarmedState in this case
             yield break;
         }
+        
+        playerController.timeDilation!.ForceTimeDilation();
         
         // Animate it coming to the hand
         yield return objectToPickUp.Pickup(
@@ -141,7 +146,6 @@ class GunEquippedState : PlayerState {
     private readonly InputAction attackAction;
     private readonly InputAction throwAction;
     
-    
     public GunEquippedState(Pistol weapon) {
         this.weapon = weapon;
         attackAction = InputSystem.actions.FindAction("Attack");
@@ -153,6 +157,8 @@ class GunEquippedState : PlayerState {
             bool didFire = weapon.FirePressed(playerController.Muzzle!);
             
             if (didFire && weapon.RequiresReload) {
+                playerController.timeDilation!.ForceTimeDilation();
+                
                 playerController.ReloadEvent!.ReloadStart?.Invoke(weapon.ReloadDuration);
             }
         }
@@ -168,7 +174,7 @@ class ThrowObjectState : PlayerState {
     private readonly Quaternion initialRotation;
     private readonly ThrowableObject throwableObjectPrefab;
     
-    private const float ThrowForce = 8_000f; // This makes no sense, why is it so high
+    private const float ThrowForce = 8_000f * 2f; // This makes no sense, why is it so high
     
     public ThrowObjectState(ThrowableObject throwableObjectPrefab, Quaternion initialRotation) {
         this.throwableObjectPrefab = throwableObjectPrefab;
@@ -180,6 +186,8 @@ class ThrowObjectState : PlayerState {
         // This normalizedTime: 0 is important
         // without it, if this was the last animation that played, it wouldn't play it again
         playerController.animator!.Play(AnimationStates.ThrowObject, -1, 0f);
+        
+        playerController.timeDilation!.ForceTimeDilation();
         
         CreateAndThrowObject(playerController);
     }
@@ -213,6 +221,7 @@ class ThrowObjectState : PlayerState {
     typeof(Target),
     typeof(Animator)
 )]
+[RequireComponent(typeof(TimeDilation))]
 public class PlayerController : MonoBehaviour {
     [Header("References")]
     [Tooltip("Transform for where we throw objects & fire bullets from")]
@@ -230,11 +239,14 @@ public class PlayerController : MonoBehaviour {
     // TODO: Honestly this should just be an enum?
     // though I don't think we ever start with a weapon?
     public Pistol? StartingWeapon;
-
+    
+    [Header("Events")]
     public PickupHoveringEvent? PickupHoveringEvent;
     public ReloadEvent? ReloadEvent;
 
     public Animator? animator { get; private set; }
+    public TimeDilation? timeDilation { get; private set; }
+    
     private InputAction? fireAction;
     private InputAction? throwAction;
     private InputAction? pickupAction;
@@ -245,6 +257,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Awake() {
         animator = GetComponent<Animator>();
+        timeDilation = GetComponent<TimeDilation>();
         fireAction = InputSystem.actions.FindAction("Attack");
         throwAction = InputSystem.actions.FindAction("Throw");
 

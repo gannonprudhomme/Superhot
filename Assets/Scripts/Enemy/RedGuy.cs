@@ -298,7 +298,7 @@ sealed class GunFindLineOfSightState: State {
 
 // Transitioned to when we get hit, but not killed
 sealed class InterruptedState : State {
-    private const float animationDuration = 0.25f;
+    private const float animationDuration = 0.75f;
     private float timeOfAnimStart;
 
     private Vector3 hitPoint;

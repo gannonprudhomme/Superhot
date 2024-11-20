@@ -312,6 +312,7 @@ GameObject:
   - component: {fileID: 105514105997448444}
   - component: {fileID: 6858655439158312910}
   - component: {fileID: 5217500125791123180}
+  - component: {fileID: 7896903294671005936}
   - component: {fileID: 3842341798497889584}
   m_Layer: 8
   m_Name: Player
@@ -411,6 +412,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Camera: {fileID: 1578631756842526021}
   RotationSpeed: 0.1
+  characterController: {fileID: 0}
+--- !u!114 &7896903294671005936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4707090414994886930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1099a77347ae2014ab188111561bd84e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TimeDilationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.05
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!95 &3842341798497889584
 Animator:
   serializedVersion: 7

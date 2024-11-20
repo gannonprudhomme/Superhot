@@ -10,17 +10,16 @@ public class DebugTimeDilationUI : MonoBehaviour {
     public Image? FillImage;
     public TextMeshProUGUI? Text;
     
-    private PlayerMovementController? playerMovementController;
+    private TimeDilation? timeDilation;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start() {
         // this is obviously bad, but it's just for debugging
-        playerMovementController = FindFirstObjectByType<PlayerMovementController>();
+        timeDilation = FindFirstObjectByType<TimeDilation>();
     }
 
-    // Update is called once per frame
     private void Update() {
-        FillImage!.fillAmount = playerMovementController!.TimeDilation;
-        Text!.text = $"{playerMovementController!.TimeDilation:F2}";
+        FillImage!.fillAmount = timeDilation!.TimeDilationValue;
+        Text!.text = $"{timeDilation!.TimeDilationValue:F2}";
     }
 }

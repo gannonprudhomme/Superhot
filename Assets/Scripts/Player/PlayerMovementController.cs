@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using UnityEngine.VFX;
 
 #nullable enable
@@ -18,36 +19,17 @@ public class PlayerMovementController : MonoBehaviour  {
     private InputAction? moveAction;
     private InputAction? jumpAction;
     private InputAction? lookAction;
-    private CharacterController? characterController;
+    public CharacterController? characterController;
     
     private const float MaxSpeed = 10f;
     private const float MovementSharpness = 5f;
     
     private float verticalCameraAngle = 0f;
-    private Vector3 velocity = Vector3.zero;
+    public Vector3 Velocity { get; private set; } = Vector3.zero;
 
     private const float DownForce = 55f;
     private const float TerminalVelocity = -10f;
     private const float JumpForce = 20f;
-    
-    private const float MinTimeDilation = 0.1f;
-    public float TimeDilation {
-        get {
-            // When we're in the air it's always 1
-            // (note the time dilation logic doesn't work when it's in the air, but it's fine cause we do this)
-            if (!characterController!.isGrounded) {
-                return 1f;
-            }
-            
-            float currSpeed = velocity.magnitude;
-            
-            // Prevent it from going below minTimeDilation
-            float dilation = Mathf.Max(currSpeed / MaxSpeed, MinTimeDilation);
-            
-            // Prevent it from being above 1
-            return Mathf.Min(dilation, 1f);
-        }
-    }
 
     private void Awake() {
         characterController = GetComponent<CharacterController>();
@@ -55,19 +37,12 @@ public class PlayerMovementController : MonoBehaviour  {
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
-        
-        // Dynamically changing this makes the forces different based on the time dilation
-        // so it seems to need to be fixed
-        Time.fixedDeltaTime = 0.02F * MinTimeDilation;
-        VFXManager.fixedTimeStep = 0.02F * MinTimeDilation;
     }
 
     // Update is called once per frame
     private void Update() {
         HandleMovement();
         HandleCameraMovement();
-        
-        Time.timeScale = TimeDilation;
     }
 
     private void HandleMovement() {
@@ -79,6 +54,8 @@ public class PlayerMovementController : MonoBehaviour  {
         
         Vector3 worldSpaceMove = transform.TransformVector(moveDirection);
         
+        float movementSharpness = moveDirection.magnitude <= 0.01f ? DecelerationMovementSharpness : MovementSharpness;
+        
         // TODO: Handle when in the air (I think there's a jump?)
 
         if (characterController!.isGrounded) {
@@ -87,9 +64,10 @@ public class PlayerMovementController : MonoBehaviour  {
             // TODO? Idek if I need to do this?
             // targetVelocity = GetDirectionReorientedOnSlope(targetVelocity.normalized, groundNormal) * targetVelocity.magnitude;
 
-            velocity = Vector3.Lerp(
-                velocity,
+            Velocity = Vector3.Lerp(
+                Velocity,
                 targetVelocity,
+                // Don't want timeScale to affect this - that's just another thing we'd have to factor in
                 MovementSharpness * Time.deltaTime
             );
         } else {
@@ -97,36 +75,36 @@ public class PlayerMovementController : MonoBehaviour  {
 
             // Treat only horizontal movement like we do with ground movement
             float x = Mathf.Lerp(
-                velocity.x,
+                Velocity.x,
                 targetVelocity.x,
                 // TODO: consider having an air movement sharpness
-                MovementSharpness * Time.unscaledDeltaTime
+                movementSharpness * Time.unscaledDeltaTime
             );
 
             float z = Mathf.Lerp(
-                velocity.z,
+                Velocity.z,
                 targetVelocity.z,
                 // TODO: consider having an air movement sharpness
-                MovementSharpness * Time.unscaledDeltaTime
+                movementSharpness * Time.unscaledDeltaTime
             );
 
             // Handle vertical velocity (isn't limited like horizontal is)
 
             // Note this is negative as it's a downward force
-            float y = velocity.y + (-DownForce * Time.deltaTime); // note this is actually subtracting
+            float y = Velocity.y + (-DownForce * Time.deltaTime); // note this is actually subtracting
 
             // Clamp it to the terminal velocity
             y = Mathf.Max(y, TerminalVelocity);
 
-            velocity = new Vector3(x, y, z);
+            Velocity = new Vector3(x, y, z);
         }
 
-        if (HandleJump(velocity, out Vector3 newVelocity)) {
+        if (HandleJump(Velocity, out Vector3 newVelocity)) {
             Debug.Log("Jumping!");
-            velocity = newVelocity;
+            Velocity = newVelocity;
         }
 
-        characterController!.Move(velocity * Time.deltaTime);
+        characterController!.Move(Velocity * Time.deltaTime);
     }
     
     // Angles per second? Idk
