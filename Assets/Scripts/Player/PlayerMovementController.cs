@@ -15,11 +15,14 @@ public class PlayerMovementController : MonoBehaviour  {
     
     [Header("Values")]
     public float RotationSpeed = 0.1f;
+
+    [Header("Events")]
+    public GameOverEvent? GameOverEvent;
     
     private InputAction? moveAction;
     private InputAction? jumpAction;
     private InputAction? lookAction;
-    public CharacterController? characterController;
+    private CharacterController? characterController;
     
     public const float MaxSpeed = 10f;
     private const float DecelerationMovementSharpness = 20f;
@@ -32,18 +35,24 @@ public class PlayerMovementController : MonoBehaviour  {
     private const float TerminalVelocity = -10f;
     private const float JumpForce = 20f;
 
+    private bool isDead = false;
+
     private void Awake() {
         characterController = GetComponent<CharacterController>();
 
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
+        
+        GameOverEvent!.Event += OnDeath;
     }
 
     // Update is called once per frame
     private void Update() {
         HandleMovement();
-        HandleCameraMovement();
+        if (!isDead) {
+            HandleCameraMovement();
+        }
     }
 
     private void HandleMovement() {
@@ -146,5 +155,9 @@ public class PlayerMovementController : MonoBehaviour  {
     private static Vector3 GetDirectionReorientedOnSlope(Vector3 direction, Vector3 slopeNormal, Vector3 transformUp) {
         Vector3 directionRight = Vector3.Cross(direction, transformUp);
         return Vector3.Cross(slopeNormal, directionRight).normalized;
+    }
+
+    private void OnDeath() {
+        isDead = true;
     }
 }

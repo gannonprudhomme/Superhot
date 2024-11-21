@@ -70,7 +70,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 65
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -235,6 +235,37 @@ MonoBehaviour:
       enableFptlForForwardOpaque: 0
       enableBigTilePrepass: 0
       isFptlEnabled: 0
+--- !u!1 &2203256173818008081
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7653965877262010148}
+  m_Layer: 8
+  m_Name: Death Look At
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7653965877262010148
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2203256173818008081}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.014, y: 5.432, z: 2.892}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1609865032141817035}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3199024674642124508
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,6 +345,7 @@ GameObject:
   - component: {fileID: 5217500125791123180}
   - component: {fileID: 7896903294671005936}
   - component: {fileID: 3842341798497889584}
+  - component: {fileID: 5288877008922878925}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -334,6 +366,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 7653965877262010148}
   - {fileID: 1558997127019655004}
   - {fileID: 2162488402639161690}
   m_Father: {fileID: 0}
@@ -378,6 +411,7 @@ MonoBehaviour:
   Muzzle: {fileID: 4114076202807892538}
   WeaponSpawnPoint: {fileID: 396000932328867625}
   Camera: {fileID: 1578631756842526021}
+  DeathLookAt: {fileID: 7653965877262010148}
   IgnoreHoverCollisionsLayerMask:
     serializedVersion: 2
     m_Bits: 128
@@ -385,6 +419,7 @@ MonoBehaviour:
   StartingWeapon: {fileID: 5361138655831565617}
   PickupHoveringEvent: {fileID: 11400000, guid: 56e404231e60fc34cbbd477fb8ea41ad, type: 2}
   ReloadEvent: {fileID: 11400000, guid: 0e9deca96b9672749a803b73252c686d, type: 2}
+  GameOverEvent: {fileID: 11400000, guid: db2e7b0364202e4428688bed0be925dd, type: 2}
 --- !u!114 &6858655439158312910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -413,7 +448,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Camera: {fileID: 1578631756842526021}
   RotationSpeed: 0.1
-  characterController: {fileID: 0}
+  GameOverEvent: {fileID: 11400000, guid: db2e7b0364202e4428688bed0be925dd, type: 2}
 --- !u!114 &7896903294671005936
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -472,6 +507,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5288877008922878925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4707090414994886930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab7a141f410532d4d91b93081093ee72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4918969901103946720
 GameObject:
   m_ObjectHideFlags: 0

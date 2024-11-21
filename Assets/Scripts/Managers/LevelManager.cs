@@ -25,25 +25,35 @@ public class LevelManager : MonoBehaviour {
         
         // Don't need to load a level scene if we already have one!
         // This is just for the Editor really - release builds only start out with the Main scene.
-        if (IsLevelSceneLoaded()) {
-            yield break;
+        if (GetLoadedLevel() is Scene currScene) {
+            currentLevelScene = currScene;
+            SceneManager.SetActiveScene(currentLevelScene.Value);
+        } else {
+            SceneManager.LoadScene(AllLevels[0], LoadSceneMode.Additive);
+            currentLevelScene = SceneManager.GetSceneByName(AllLevels[0]);
+            SceneManager.SetActiveScene(currentLevelScene.Value);
         }
-        
-        SceneManager.LoadScene(AllLevels[0], LoadSceneMode.Additive);
-        currentLevelScene = SceneManager.GetSceneByName(AllLevels[0]);
+    }
+
+    public IEnumerator ReloadLevel() {
+        string currentLevelSceneName = currentLevelScene!.Value.name;
+        // unload it & reload it
+        yield return SceneManager.UnloadSceneAsync(currentLevelSceneName);
+        yield return SceneManager.LoadSceneAsync(currentLevelSceneName, LoadSceneMode.Additive);
+        currentLevelScene = SceneManager.GetSceneByName(currentLevelSceneName);
         SceneManager.SetActiveScene(currentLevelScene.Value);
     }
 
-    private bool IsLevelSceneLoaded() {
+    private Scene? GetLoadedLevel() {
         HashSet<string> allSceneNames = new(AllLevels!);
         
         for (int i = 0; i < SceneManager.sceneCount; i++) {
             Scene scene = SceneManager.GetSceneAt(i);
             if (allSceneNames.Contains(scene.name)) {
-                return true;
+                return scene;
             }
         }
 
-        return false;
+        return null;
     }
 }

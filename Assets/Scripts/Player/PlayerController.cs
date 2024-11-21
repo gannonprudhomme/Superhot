@@ -146,7 +146,7 @@ class PickupThrowableObjectState : PlayerState {
         // TODO: Based on what type of object this is, move to the according state
         playerController.ChangeState(new GunEquippedState(weapon));
     }
-} 
+}
 
 class GunEquippedState : PlayerState {
     private readonly Pistol weapon;
@@ -247,7 +247,10 @@ class ThrowObjectState : PlayerState {
     typeof(Target),
     typeof(Animator)
 )]
-[RequireComponent(typeof(TimeDilation))]
+[RequireComponent(
+    typeof(TimeDilation),
+    typeof(Collidable)
+)]
 public class PlayerController : MonoBehaviour {
     [Header("References")]
     [Tooltip("Transform for where we throw objects & fire bullets from")]
@@ -271,9 +274,11 @@ public class PlayerController : MonoBehaviour {
     [Header("Events")]
     public PickupHoveringEvent? PickupHoveringEvent;
     public ReloadEvent? ReloadEvent;
+    public GameOverEvent? GameOverEvent;
 
     public Animator? animator { get; private set; }
     public TimeDilation? timeDilation { get; private set; }
+    private Collidable? collidable;
     
     private InputAction? fireAction;
     private InputAction? throwAction;
@@ -286,6 +291,10 @@ public class PlayerController : MonoBehaviour {
     private void Awake() {
         animator = GetComponent<Animator>();
         timeDilation = GetComponent<TimeDilation>();
+        collidable = GetComponent<Collidable>();
+
+        collidable!.OnHit += OnHit;
+        
         fireAction = InputSystem.actions.FindAction("Attack");
         throwAction = InputSystem.actions.FindAction("Throw");
 
@@ -307,5 +316,9 @@ public class PlayerController : MonoBehaviour {
         playerState.OnExit(this);
         newState.OnEnter(this);
         playerState = newState;
+    }
+
+    private void OnHit(Collidable.Parameters parameters) {
+        GameOverEvent!.Event?.Invoke();
     }
 }

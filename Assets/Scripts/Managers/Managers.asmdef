@@ -2,7 +2,8 @@
     "name": "Managers",
     "rootNamespace": "",
     "references": [
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Events"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
