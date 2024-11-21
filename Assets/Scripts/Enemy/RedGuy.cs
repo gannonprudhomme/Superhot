@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.VFX;
 using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 #nullable enable
 
@@ -269,6 +270,63 @@ sealed class FireGunState : State {
     }
 }
 
+sealed class StrafeAndFireGunState : State {
+    private readonly Pistol gun;
+
+    public StrafeAndFireGunState(Pistol gun) {
+        this.gun = gun;
+    }
+
+    public void OnEnter(RedGuy redGuy) {
+        // Find a strafe position, maybe within a 30 degree angle of between the redGuy and the player
+        // and then strafe to that position
+        // and then fire
+        
+        var target = Target.instance!;
+        Vector3 directionToTarget = (target.AimPoint!.position - redGuy.transform.position).normalized;
+
+        // get the perpendicular vector to the direction to the target
+        // by rotating the vector 90 degrees around the y-axis
+        // how does this work? idk
+        Vector3 perpendicular = new Vector3(directionToTarget.z, 0, -directionToTarget.x).normalized;
+        
+        // Get a random number from 3 to 7
+        float strafeDistance = Random.Range(-7f, 7f); // move left / right
+        Vector3 strafePosition = redGuy.transform.position + (perpendicular * strafeDistance); // move it horizontally
+        // move it forward
+        strafePosition += directionToTarget * Random.Range(-2f, 4f);
+        
+        redGuy.DisableRotation(); // we're handling the rotation ourselves
+        redGuy.SetDestination(strafePosition);
+    }
+
+    public void OnUpdate(RedGuy redGuy) {
+        if (!redGuy.HasLineOfSightToTarget()) {
+            // We don't have line of sight anymore, so we can't shoot
+            redGuy.ChangeState(new GunFindLineOfSightState(gun, Target.instance));
+            return;
+        }
+        
+        const float remainingDistanceThreshold = 0.1f;
+        if (redGuy.navMeshAgent!.remainingDistance < remainingDistanceThreshold) {
+            // strafe again baby! easier this way
+            redGuy.ChangeState(new StrafeAndFireGunState(gun));
+            return;
+        }
+        
+        // we're handling the rotation, so we always face the player
+        // blend tree should make the animation work perfectly fine
+        redGuy.RotateTowards(Target.instance!.AimPoint!.position);
+        
+        Vector3 direction = (Target.instance!.AimPoint!.position - redGuy!.Muzzle!.position).normalized;
+        gun.FireIfPossible(redGuy.Muzzle!.position, direction);
+    }
+    
+    public void OnExit(RedGuy redGuy) {
+        redGuy.EnableRotation();
+    }
+}
+
 // We have a gun equipped, and want to find line of sight as soon as we can
 // once we do, we'll switch to the Fire state
 sealed class GunFindLineOfSightState: State {
@@ -287,7 +345,7 @@ sealed class GunFindLineOfSightState: State {
     public void OnUpdate(RedGuy redGuy) {
         // As soon as we have line of sight, we should fire
         if (redGuy.HasLineOfSightToTarget()) {
-            redGuy.ChangeState(new FireGunState(gun));
+            redGuy.ChangeState(new StrafeAndFireGunState(gun));
             return;
         }
         
@@ -397,7 +455,7 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
     // It takes 3-4 hits (melee or thrown objects) to kill
     private int health = 3;
     
-    private NavMeshAgent? navMeshAgent;
+    public NavMeshAgent? navMeshAgent { get; private set; }
     public Animator? animator { get; private set; }
     private Rigidbody? rigidbody;
     private State currentState;
@@ -485,6 +543,18 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
         // Probably just change this to:
         // navMeshAgent!.enabled = false;
         navMeshAgent!.ResetPath();;
+    }
+
+    private float angularSpeed = -1f;
+    public void EnableRotation() {
+        navMeshAgent!.updateRotation = true;
+        navMeshAgent!.angularSpeed = angularSpeed;
+    }
+    
+    public void DisableRotation() {
+        navMeshAgent!.updateRotation = false;
+        angularSpeed = navMeshAgent!.angularSpeed;
+        navMeshAgent!.angularSpeed = 0;
     }
 
     public void EnablePhysics() {
