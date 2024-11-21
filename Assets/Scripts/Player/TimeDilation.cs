@@ -31,6 +31,17 @@ public class TimeDilation : MonoBehaviour  {
 
     public float TimeDilationValue {
         get {
+            // TODO: This is bugging out blehhh
+            // idk what changed
+            /*
+            if (!movementController!.characterController!.isGrounded) {
+                Debug.Log("Not grounded");
+                return 1f; // Force real-time when in the air
+            } else {
+                Debug.Log("Grounded");
+            }
+            */
+            
             float horizontalSpeed = new Vector2(velocity.x, velocity.z).magnitude;
             
             float percentSpeed = horizontalSpeed / PlayerMovementController.MaxSpeed; // curve's t value, [0, 1]

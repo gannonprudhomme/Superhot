@@ -20,7 +20,7 @@ public class Bullet : MonoBehaviour {
     
     private Vector3 lastRootPosition = Vector3.negativeInfinity;
 
-    private const float speed = 20f; 
+    private const float speed = 30f; 
     private Vector3 velocity = Vector3.zero;
 
     private float timeOfStart = Mathf.Infinity;
