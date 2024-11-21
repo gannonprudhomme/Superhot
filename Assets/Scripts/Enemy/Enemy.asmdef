@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "Physics",
-        "Weapons]"
+        "Weapons]",
+        "Events"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -72,7 +72,9 @@ public class Bullet : MonoBehaviour {
             return;
         }
         // Handle case of casting while already inside a collider
+        // when tf does this happen?
         if (closestHit.distance <= 0f) {
+            Debug.LogError($"Ack, for {closestHit.collider.gameObject.name}");
             closestHit.point = Root!.position;
             closestHit.normal = -transform.forward;
         }

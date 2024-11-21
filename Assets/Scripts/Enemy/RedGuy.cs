@@ -347,6 +347,7 @@ sealed class KilledState : State {
     public void OnEnter(RedGuy redGuy) {
         // Start the animation
         // also ragdoll maybe?
+        redGuy.EnemyDiedEvent!.Event?.Invoke(redGuy.gameObject.GetInstanceID());
         
         redGuy.PlayDamagedVFX(hitPoint);
         
@@ -368,6 +369,7 @@ sealed class KilledState : State {
     typeof(Rigidbody)
 )]
 public class RedGuy : MonoBehaviour { // TODO: I might as well just call this Enemy
+    [Header("Local references")]
     public Pistol? CurrentWeapon;
 
     [Tooltip("The muzzle of the gun, where we fire bullets from")]
@@ -382,11 +384,15 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
     [Tooltip("Reference to the collidable component so we can receive hit updates from the player")]
     public Collidable? Collidable;
 
+    [Header("Prefabs")]
     [Tooltip("Prefab we create when this dies")]
     public GameObject? DestroyedPrefab;
-
     [Tooltip("VFX prefab we create whenever this is hit by something")]
     public VisualEffect? OnHitVFXPrefab;
+
+    [Header("Events")]
+    public EnemyLoadedEvent? EnemyLoadedEvent;
+    public EnemyDiedEvent? EnemyDiedEvent;
 
     // It takes 3-4 hits (melee or thrown objects) to kill
     private int health = 3;
@@ -413,6 +419,8 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
         rigidBodyCollidable!.OnHit += OnHit;
         
         Collidable!.OnHit += OnHit;
+        
+        EnemyLoadedEvent!.Event?.Invoke(gameObject.GetInstanceID());
         
         // since I need some form of level editor
         currentState.OnEnter(this);

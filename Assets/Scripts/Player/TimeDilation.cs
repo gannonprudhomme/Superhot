@@ -16,7 +16,6 @@ public class TimeDilation : MonoBehaviour  {
     
     private const float MinTimeDilation = 0.05f;
     
-    private InputAction? moveAction;
     private PlayerMovementController movementController;
     private Vector3 velocity => movementController!.Velocity;
     
@@ -50,13 +49,13 @@ public class TimeDilation : MonoBehaviour  {
         VFXManager.fixedTimeStep = 0.02F * MinTimeDilation;
         
         movementController = GetComponent<PlayerMovementController>();
-        moveAction = InputSystem.actions.FindAction("Move");
     }
 
     private void Update() {
         Time.timeScale = TimeDilationValue;
     }
 
+    // force time dilation to speed up
     public void ForceTimeDilation(float unscaledDuration = 0.25f) {
         unscaledTimeOfLastForcedTimeDilation = Time.unscaledTime;
         currentForcedTimeDilationDuration = unscaledDuration;

@@ -1,4 +1,5 @@
 using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -242,6 +243,12 @@ class ThrowObjectState : PlayerState {
     }
 }
 
+class KilledState : PlayerState {
+    public void OnEnter(PlayerController playerController) {
+        playerController.Camera!.transform.DOLookAt(playerController.DeathLookAt!.position, 0.25f);
+    }
+}
+
 [RequireComponent(
     typeof(PlayerMovementController),
     typeof(Target),
@@ -261,6 +268,9 @@ public class PlayerController : MonoBehaviour {
 
     [Tooltip("The player / first-person camera, which we use to check if we're aiming at an interactable")]
     public Camera? Camera;
+
+    [Tooltip("The transform we rotate to look at when we die")]
+    public Transform? DeathLookAt;
     
     [Tooltip("LayerMask we use to ignore collisions for the pickups, so we only get the hover hitbox")]
     public LayerMask IgnoreHoverCollisionsLayerMask;
@@ -320,5 +330,6 @@ public class PlayerController : MonoBehaviour {
 
     private void OnHit(Collidable.Parameters parameters) {
         GameOverEvent!.Event?.Invoke();
+        ChangeState(new KilledState());
     }
 }

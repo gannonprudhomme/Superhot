@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2504174148840956704}
   - component: {fileID: 5965963936886701461}
   - component: {fileID: 7570143083082257612}
+  - component: {fileID: 5999682419736966703}
   - component: {fileID: 3806966161054815405}
   m_Layer: 0
   m_Name: Managers
@@ -46,8 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8517148f71b0f16408e2e2d322ee5d5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameOverEvent: {fileID: 11400000, guid: db2e7b0364202e4428688bed0be925dd, type: 2}
+  LevelTransitionCamera: {fileID: 0}
   FullscreenMaterial: {fileID: 2100000, guid: f46baa85fc1da394bacb375666c8e4c0, type: 2}
+  GameOverEvent: {fileID: 11400000, guid: db2e7b0364202e4428688bed0be925dd, type: 2}
 --- !u!114 &7570143083082257612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,6 +64,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AllLevels:
   - Test Level
+  - Test Level 2
+  LevelLoadedEvent: {fileID: 11400000, guid: 7d8dece7f0cc6bc4f874141f6ccb9596, type: 2}
+--- !u!114 &5999682419736966703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6930346976496490850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f56a435f80664454f9fa35818a47f3c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EnemyLoadedEvent: {fileID: 11400000, guid: 758c969b609132243b386e1f1ad83b88, type: 2}
+  EnemyDiedEvent: {fileID: 11400000, guid: b3bb4a7ce3b2d8e43b46fcf6cbaa8b0b, type: 2}
 --- !u!114 &3806966161054815405
 MonoBehaviour:
   m_ObjectHideFlags: 0

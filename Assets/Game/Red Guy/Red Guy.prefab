@@ -230,6 +230,8 @@ MonoBehaviour:
   Collidable: {fileID: 6555407978028424790}
   DestroyedPrefab: {fileID: 3108830373291015470, guid: 368dea293d3387345af427ca5f4a1434, type: 3}
   OnHitVFXPrefab: {fileID: 2818405208371967605, guid: 2f809aea341fbc14b861bfa95c75d4be, type: 3}
+  EnemyLoadedEvent: {fileID: 11400000, guid: 758c969b609132243b386e1f1ad83b88, type: 2}
+  EnemyDiedEvent: {fileID: 11400000, guid: b3bb4a7ce3b2d8e43b46fcf6cbaa8b0b, type: 2}
 --- !u!195 &5652606821693855857
 NavMeshAgent:
   m_ObjectHideFlags: 0
