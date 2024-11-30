@@ -87,8 +87,9 @@ sealed class UnarmedChaseState : State {
             } else if (collider.TryGetComponent<ThrowableParentPointer>(out var parentPointer)) {
                 foundThrowableObject = parentPointer.Parent;
             }
-            
-            if (foundThrowableObject == null) {
+
+            bool isPickupAGun = foundThrowableObject.WeaponPrefab! is Gun;
+            if (foundThrowableObject == null || !isPickupAGun) {
                 continue;
             }
 
@@ -226,8 +227,12 @@ sealed class PerformPickupState: State {
         if (!readyToPickUp) {
             return;
         }
-        
-        redGuy.EquipWeapon(objectToPickUp.WeaponPrefab!);
+
+        if (objectToPickUp.WeaponPrefab is Gun gunPrefab) {
+            redGuy.EquipWeapon(gunPrefab);
+        } else {
+            Debug.LogError("What are we trying to pick up!?");
+        }
         
         Object.Destroy(objectToPickUp.gameObject);
 
@@ -238,9 +243,9 @@ sealed class PerformPickupState: State {
 // We have a gun equipped, and have (or just had) line of sight
 // so shoot!
 sealed class FireGunState : State {
-    private readonly Pistol gun;
+    private readonly Gun gun;
     
-    public FireGunState(Pistol gun) {
+    public FireGunState(Gun gun) {
         this.gun = gun;
     }
     
@@ -271,9 +276,9 @@ sealed class FireGunState : State {
 }
 
 sealed class StrafeAndFireGunState : State {
-    private readonly Pistol gun;
+    private readonly Gun gun;
 
-    public StrafeAndFireGunState(Pistol gun) {
+    public StrafeAndFireGunState(Gun gun) {
         this.gun = gun;
     }
 
@@ -330,10 +335,10 @@ sealed class StrafeAndFireGunState : State {
 // We have a gun equipped, and want to find line of sight as soon as we can
 // once we do, we'll switch to the Fire state
 sealed class GunFindLineOfSightState: State {
-    private readonly Pistol gun;
+    private readonly Gun gun;
     private readonly Target target;
     
-    public GunFindLineOfSightState(Pistol gun, Target target) {
+    public GunFindLineOfSightState(Gun gun, Target target) {
         this.gun = gun;
         this.target = target;
     }
@@ -428,7 +433,7 @@ sealed class KilledState : State {
 )]
 public class RedGuy : MonoBehaviour { // TODO: I might as well just call this Enemy
     [Header("Local references")]
-    public Pistol? CurrentWeapon;
+    public Gun? CurrentWeapon;
 
     [Tooltip("The muzzle of the gun, where we fire bullets from")]
     public Transform? Muzzle;
@@ -567,7 +572,7 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
         rigidbody!.isKinematic = true;
     }
 
-    public void EquipWeapon(Pistol weaponPrefab) {
+    public void EquipWeapon(Gun weaponPrefab) {
         CurrentWeapon = Instantiate(weaponPrefab, WeaponSpawnPoint!);
         CurrentWeapon.transform.SetPositionAndRotation(WeaponSpawnPoint!.position, WeaponSpawnPoint.rotation);
     }

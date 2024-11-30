@@ -7,9 +7,6 @@ using UnityEngine;
 
 #nullable enable
 
-// Honestly this is more like a *Thrown* object - the Pistol class is more of the ThrowableObject
-// or a bottle in the hand would be a ThrowableObject
-// thus consider renaming this
 [RequireComponent(
     typeof(Rigidbody)
 )]
@@ -17,7 +14,7 @@ public class ThrownObject : MonoBehaviour  {
     public Rigidbody? Rigidbody { get; private set; }
 
     [Tooltip("Weapon prefab which is created whenever this is picked up")]
-    public Pistol? WeaponPrefab;
+    public Weapon? WeaponPrefab;
 
     [Tooltip("Prefab that is created when this object is destroyed")]
     public GameObject? DestructedPrefab;

@@ -134,7 +134,7 @@ class PickupThrowableObjectState : PlayerState {
         
         // It's done! Actually pick it up
         
-        Pistol weapon = Object.Instantiate(
+        Weapon weapon = Object.Instantiate(
             objectToPickUp.WeaponPrefab!,
             playerController.WeaponSpawnPoint // We want it to be under the Weapon Spawn Point
         );
@@ -143,18 +143,23 @@ class PickupThrowableObjectState : PlayerState {
         weapon!.transform.localEulerAngles = Vector3.zero;
 
         Object.Destroy(objectToPickUp.gameObject);
-        
-        // TODO: Based on what type of object this is, move to the according state
-        playerController.ChangeState(new GunEquippedState(weapon));
+
+        if (weapon is Gun gun) {
+            // TODO: Based on what type of object this is, move to the according state
+            playerController.ChangeState(new GunEquippedState(gun));
+        } else {
+            // generic throwable
+            Debug.LogError("We don't have anything to do here!");
+        }
     }
 }
 
 class GunEquippedState : PlayerState {
-    private readonly Pistol weapon;
+    private readonly Gun weapon;
     private readonly InputAction attackAction;
     private readonly InputAction throwAction;
     
-    public GunEquippedState(Pistol weapon) {
+    public GunEquippedState(Gun weapon) {
         this.weapon = weapon;
         attackAction = InputSystem.actions.FindAction("Attack");
         throwAction = InputSystem.actions.FindAction("Throw");
