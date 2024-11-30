@@ -55,7 +55,7 @@ sealed class UnarmedChaseState : State {
         }
     }
 
-    private ThrowableObject? FindBestNearbyWeapon(Vector3 position) {
+    private ThrownObject? FindBestNearbyWeapon(Vector3 position) {
         // TOOD: We only want to pick up weapons - not basic throwables like bottles, etc
 
         Collider[] foundColliders = new Collider[5];
@@ -71,7 +71,7 @@ sealed class UnarmedChaseState : State {
             return null;
         }
         
-        ThrowableObject? closestWeapon = null;
+        ThrownObject? closestWeapon = null;
         // TODO: Really this should be how long is the path to it, rather than just the distance between the points
         // so worth considering improving this
         int closestDistance = int.MaxValue;
@@ -81,9 +81,9 @@ sealed class UnarmedChaseState : State {
                 continue;
             }
             
-            ThrowableObject? foundThrowableObject;
+            ThrownObject? foundThrowableObject;
             
-            if (collider.TryGetComponent<ThrowableObject>(out foundThrowableObject)) {
+            if (collider.TryGetComponent<ThrownObject>(out foundThrowableObject)) {
             } else if (collider.TryGetComponent<ThrowableParentPointer>(out var parentPointer)) {
                 foundThrowableObject = parentPointer.Parent;
             }
@@ -170,9 +170,9 @@ sealed class UnarmedAttackState : State {
 }
 
 sealed class MoveToPickupState : State {
-    private readonly ThrowableObject objectToPickUp;
+    private readonly ThrownObject objectToPickUp;
 
-    public MoveToPickupState(ThrowableObject toPickUp) {
+    public MoveToPickupState(ThrownObject toPickUp) {
         this.objectToPickUp = toPickUp;
     }
     
@@ -200,12 +200,12 @@ sealed class MoveToPickupState : State {
 }
 
 sealed class PerformPickupState: State {
-    private readonly ThrowableObject objectToPickUp;
+    private readonly ThrownObject objectToPickUp;
     private const float animationDuration = 0.25f;
     
     private float timeOfAnimStart;
     
-    public PerformPickupState(ThrowableObject toPickUp) {
+    public PerformPickupState(ThrownObject toPickUp) {
         this.objectToPickUp = toPickUp;
     }
     
@@ -577,7 +577,7 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
             return;
         }
         
-        Instantiate(CurrentWeapon.ThrowablePrefab!, WeaponSpawnPoint!.position, WeaponSpawnPoint!.rotation);
+        Instantiate(CurrentWeapon.ThrownPrefab!, WeaponSpawnPoint!.position, WeaponSpawnPoint!.rotation);
         
         Destroy(CurrentWeapon.gameObject);
         CurrentWeapon = null;

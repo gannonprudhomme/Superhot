@@ -4,7 +4,9 @@
     "references": [
         "Unity.InputSystem",
         "Events",
-        "Enemy"
+        "Enemy",
+        "Physics",
+        "Weapons]"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

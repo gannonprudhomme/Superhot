@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4159912600371458935}
   - component: {fileID: 2862287114306993237}
   m_Layer: 0
-  m_Name: Throwable Pistol
+  m_Name: Thrown Pistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

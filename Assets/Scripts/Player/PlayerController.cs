@@ -26,7 +26,7 @@ class UnarmedState : PlayerState {
 
     // Local state
     private Collidable? currentAimedAtCollidable = null;
-    private ThrowableObject? currentAimedAtThrowableObject = null;
+    private ThrownObject? currentAimedAtThrowableObject = null;
     private Vector3 aimedAtPoint = Vector3.zero;
 
     private bool useLeftPunch = false; // Used to alternate between left & right arms
@@ -107,9 +107,9 @@ class UnarmedState : PlayerState {
 }
 
 class PickupThrowableObjectState : PlayerState {
-    private readonly ThrowableObject objectToPickUp;
+    private readonly ThrownObject objectToPickUp;
     
-    public PickupThrowableObjectState(ThrowableObject objectToPickUp) {
+    public PickupThrowableObjectState(ThrownObject objectToPickUp) {
         this.objectToPickUp = objectToPickUp;
     }
     
@@ -167,7 +167,7 @@ class GunEquippedState : PlayerState {
                 // TODO: I think play a half-shoot animation?
                 // then on next fire (LMB pressed, not RMB), throw the weapon
                 // For now I'm just going to throw it immediately
-                playerController.ChangeState(new ThrowObjectState(weapon.ThrowablePrefab!, playerController.Muzzle!.rotation, weapon.gameObject));
+                playerController.ChangeState(new ThrowObjectState(weapon.ThrownPrefab!, playerController.Muzzle!.rotation, weapon.gameObject));
                 return;
             }
             
@@ -188,20 +188,20 @@ class GunEquippedState : PlayerState {
         
         // Should this be an else-if?
         if (throwAction.WasPressedThisFrame()) {
-            playerController.ChangeState(new ThrowObjectState(weapon.ThrowablePrefab!, playerController.Muzzle!.rotation, weapon.gameObject));
+            playerController.ChangeState(new ThrowObjectState(weapon.ThrownPrefab!, playerController.Muzzle!.rotation, weapon.gameObject));
         }
     }
 }
 
 class ThrowObjectState : PlayerState {
     private readonly Quaternion initialRotation;
-    private readonly ThrowableObject throwableObjectPrefab;
+    private readonly ThrownObject thrownObjectPrefab;
     private readonly GameObject originalWeapon;
     
     private const float ThrowForce = 8_000f * 2f; // This makes no sense, why is it so high
     
-    public ThrowObjectState(ThrowableObject throwableObjectPrefab, Quaternion initialRotation, GameObject originalWeapon) {
-        this.throwableObjectPrefab = throwableObjectPrefab;
+    public ThrowObjectState(ThrownObject thrownObjectPrefab, Quaternion initialRotation, GameObject originalWeapon) {
+        this.thrownObjectPrefab = thrownObjectPrefab;
         this.initialRotation = initialRotation;
         this.originalWeapon = originalWeapon;
     }
@@ -229,17 +229,17 @@ class ThrowObjectState : PlayerState {
         Transform muzzle = playerController.Muzzle!;
         
         // Spawn a throwable variation of it
-        ThrowableObject throwableInstance = Object.Instantiate(
-            throwableObjectPrefab!,
+        ThrownObject thrownInstance = Object.Instantiate(
+            thrownObjectPrefab!,
             muzzle!.position + (muzzle!.forward * 0.5f), // Move it slightly forward so it doesn't collide w/ the camera
             initialRotation
         );
         
-        throwableInstance.OnThrown();
+        thrownInstance.OnThrown();
         
         Vector3 force = muzzle!.forward * ThrowForce; // TODO: This should incorporate the player's velocity
 
-        throwableInstance.Rigidbody!.AddForce(force, ForceMode.Acceleration);
+        thrownInstance.Rigidbody!.AddForce(force, ForceMode.Acceleration);
     }
 }
 

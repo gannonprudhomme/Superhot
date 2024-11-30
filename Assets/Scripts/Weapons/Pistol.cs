@@ -1,9 +1,10 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 #nullable enable
 
 public interface Weapon {
-    public ThrowableObject? ThrowablePrefab { get; }
+    public ThrownObject? ThrownPrefab { get; }
     
     // Muzzle is really just where the bullets fire from
     // It's not actually the muzzle of the gun
@@ -22,9 +23,9 @@ public sealed class Pistol : MonoBehaviour, Weapon {
     public GameObject? BulletPrefab;
     
     [Tooltip("Prefab for the throwable object that's used when we throw this")]
-    public ThrowableObject? _ThrowablePrefab;
+    public ThrownObject? _ThrownPrefab;
     
-    public ThrowableObject? ThrowablePrefab => _ThrowablePrefab!;
+    public ThrownObject? ThrownPrefab => _ThrownPrefab!;
 
     private const float StartingAmmo = 5;
     private float ammoCount = StartingAmmo;

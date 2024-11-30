@@ -45,8 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35276e6eb946be748a29cb33c637e24c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ThrownPrefab: {fileID: 4159912600371458935, guid: ad71a44770bad12449198da5e1ee5869, type: 3}
   BulletPrefab: {fileID: 6800999774376925832, guid: e820aa97809e4194496f8dcac0e4e099, type: 3}
-  _ThrowablePrefab: {fileID: 4159912600371458935, guid: ad71a44770bad12449198da5e1ee5869, type: 3}
 --- !u!1001 &1379555198127765726
 PrefabInstance:
   m_ObjectHideFlags: 0
