@@ -795,9 +795,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5965963936886701461, guid: 6d43bf3931b14e3408012ec94c92e2e6, type: 3}
+      propertyPath: DisableGameOver
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5965963936886701461, guid: 6d43bf3931b14e3408012ec94c92e2e6, type: 3}
       propertyPath: LevelTransitionCamera
       value: 
       objectReference: {fileID: 17156653}
+    - target: {fileID: 5965963936886701461, guid: 6d43bf3931b14e3408012ec94c92e2e6, type: 3}
+      propertyPath: DisableSwitchOnSuccess
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6930346976496490850, guid: 6d43bf3931b14e3408012ec94c92e2e6, type: 3}
       propertyPath: m_Name
       value: Managers

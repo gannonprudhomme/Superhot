@@ -127,29 +127,43 @@ class PickupThrowableObjectState : PlayerState {
         
         playerController.timeDilation!.ForceTimeDilation();
         
+        Transform spawnPoint;
+        switch (objectToPickUp.WeaponPrefab) {
+        case Gun:
+            spawnPoint = playerController.GunSpawnPoint!;
+            break;
+        case ThrowableWeapon:
+            spawnPoint = playerController.ThrowableSpawnPoint!;
+            break;
+        default:
+            Debug.LogError("Unknown weapon type");
+            yield break;
+        }
+        
         // Animate it coming to the hand
         yield return objectToPickUp.Pickup(
-            goalTransform: playerController.WeaponSpawnPoint!
+            goalTransform: spawnPoint!
         );
         
         // It's done! Actually pick it up
-        
-        Weapon weapon = Object.Instantiate(
-            objectToPickUp.WeaponPrefab!,
-            playerController.WeaponSpawnPoint // We want it to be under the Weapon Spawn Point
-        );
+        Weapon weapon = Object.Instantiate(objectToPickUp.WeaponPrefab!, spawnPoint);
 
-        weapon!.transform.position = playerController.WeaponSpawnPoint!.TransformPoint(Vector3.zero);
+        weapon!.transform.position = spawnPoint.TransformPoint(Vector3.zero);
         weapon!.transform.localEulerAngles = Vector3.zero;
 
         Object.Destroy(objectToPickUp.gameObject);
 
-        if (weapon is Gun gun) {
-            // TODO: Based on what type of object this is, move to the according state
+        // Based on what type of object this is, move to the according state
+        switch (weapon) {
+        case Gun gun:
             playerController.ChangeState(new GunEquippedState(gun));
-        } else {
-            // generic throwable
-            Debug.LogError("We don't have anything to do here!");
+            break;
+        case ThrowableWeapon throwable:
+            playerController.ChangeState(new ThrowableEquippedState(throwable));
+            break;
+        default:
+            Debug.LogError("Unknown weapon type");
+            break;
         }
     }
 }
@@ -193,11 +207,45 @@ class GunEquippedState : PlayerState {
         
         // Should this be an else-if?
         if (throwAction.WasPressedThisFrame()) {
-            playerController.ChangeState(new ThrowObjectState(weapon.ThrownPrefab!, playerController.Muzzle!.rotation, weapon.gameObject));
+            var newState = new ThrowObjectState(
+                weapon.ThrownPrefab!,
+                playerController.GunSpawnPoint!.rotation,
+                weapon.gameObject
+            );
+            
+            playerController.ChangeState(newState);
         }
     }
 }
 
+class ThrowableEquippedState : PlayerState {
+    private readonly ThrowableWeapon throwable;
+    private readonly InputAction attackAction;
+    private readonly InputAction throwAction;
+    
+    public ThrowableEquippedState(ThrowableWeapon throwable) {
+        this.throwable = throwable;
+        attackAction = InputSystem.actions.FindAction("Attack");
+        throwAction = InputSystem.actions.FindAction("Throw");
+    }
+
+    public void OnUpdate(PlayerController playerController) {
+        // Either should work
+        // TODO: Figure out what Superhot does
+        if (attackAction.WasPressedThisFrame() || throwAction.WasPressedThisFrame()) {
+            // attack was pressed
+            var newState = new ThrowObjectState(
+                throwable.ThrownPrefab!,
+                playerController.ThrowableSpawnPoint!.rotation,
+                throwable.gameObject
+            );
+            
+            playerController.ChangeState(newState);
+        }
+    }
+}
+
+// Actually throw the object
 class ThrowObjectState : PlayerState {
     private readonly Quaternion initialRotation;
     private readonly ThrownObject thrownObjectPrefab;
@@ -226,7 +274,8 @@ class ThrowObjectState : PlayerState {
 
     public void OnUpdate(PlayerController playerController) {
         // It doesn't like us changing states in OnEnter, so have to do it here bleh
-        // TODO: Figure out why
+        // TODO: Figure out why - this is a flaw of my state machine system
+        // or maybe it's a flaw in how I'm actually using it?
         playerController.ChangeState(new UnarmedState());
     }
 
@@ -265,26 +314,34 @@ class KilledState : PlayerState {
 )]
 public class PlayerController : MonoBehaviour {
     [Header("References")]
-    [Tooltip("Transform for where we throw objects & fire bullets from")]
-    public Transform? Muzzle;
-
-    [Tooltip("The transform which we place the equipped weapon under")]
-    public Transform? WeaponSpawnPoint;
-
     [Tooltip("The player / first-person camera, which we use to check if we're aiming at an interactable")]
     public Camera? Camera;
+    
+    // TODO: Honestly this should just be an enum?
+    // though I don't think we ever start with a weapon?
+    [Tooltip("Weapon the player starts out. Probably not needed in the 'final' game")]
+    public Weapon? StartingWeapon;
+    
+    [Header("Transforms")]
+    [Tooltip("The transform which we place the equipped gun under")]
+    public Transform? GunSpawnPoint;
+
+    [Tooltip("The transform which we place the equipped throwable under")]
+    public Transform? ThrowableSpawnPoint;
+    
+    [Tooltip("Transform for where we throw objects & fire bullets from")]
+    public Transform? Muzzle;
 
     [Tooltip("The transform we rotate to look at when we die")]
     public Transform? DeathLookAt;
     
+    [Header("Layer Masks")]
     [Tooltip("LayerMask we use to ignore collisions for the pickups, so we only get the hover hitbox")]
     public LayerMask IgnoreHoverCollisionsLayerMask;
-
-    public ForceArea? ForceAreaPrefab;
     
-    // TODO: Honestly this should just be an enum?
-    // though I don't think we ever start with a weapon?
-    public Pistol? StartingWeapon;
+    [Header("Prefabs")]
+    [Tooltip("ForceArea prefab we use to apply force to objects when we punch them")]
+    public ForceArea? ForceAreaPrefab;
     
     [Header("Events")]
     public PickupHoveringEvent? PickupHoveringEvent;
@@ -314,7 +371,17 @@ public class PlayerController : MonoBehaviour {
         throwAction = InputSystem.actions.FindAction("Throw");
 
         if (StartingWeapon != null) {
-            playerState = new GunEquippedState(StartingWeapon);
+            switch (StartingWeapon) {
+            case Gun gun: // `StartingWeapon is Gun gun`
+                playerState = new GunEquippedState(gun);
+                break;
+            case ThrowableWeapon throwable:
+                playerState = new ThrowableEquippedState(throwable);
+                break;
+            default:
+                Debug.LogError("Unhandled starting weapon type!");
+                break;
+            }
         } else {
             playerState = new UnarmedState();
         }

@@ -50,6 +50,8 @@ MonoBehaviour:
   LevelTransitionCamera: {fileID: 0}
   FullscreenMaterial: {fileID: 2100000, guid: f46baa85fc1da394bacb375666c8e4c0, type: 2}
   GameOverEvent: {fileID: 11400000, guid: db2e7b0364202e4428688bed0be925dd, type: 2}
+  DisableGameOver: 0
+  DisableSwitchOnSuccess: 0
 --- !u!114 &7570143083082257612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65,7 +67,6 @@ MonoBehaviour:
   AllLevels:
   - Test Level
   - Test Level 2
-  LevelLoadedEvent: {fileID: 11400000, guid: 7d8dece7f0cc6bc4f874141f6ccb9596, type: 2}
 --- !u!114 &5999682419736966703
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -96,3 +97,4 @@ MonoBehaviour:
   - {fileID: 5944466225402746086, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
   - {fileID: 9109574753712525345, guid: add7d52dd48d6194c8c9957f14db53c4, type: 3}
   - {fileID: 5498063768781464282, guid: ad71a44770bad12449198da5e1ee5869, type: 3}
+  - {fileID: 1956345703383806494, guid: 7ec33578d1b204336b056bc6f7f1e545, type: 3}
