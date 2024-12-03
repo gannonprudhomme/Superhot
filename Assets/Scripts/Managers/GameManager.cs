@@ -21,6 +21,15 @@ public class GameManager : MonoBehaviour {
     [Header("Events")]
     public GameOverEvent? GameOverEvent;
 
+    [Header("Debug")]
+    // TODO: This doesn't work since we need to disable it in the Player
+    // so we might need to set this flag elsewhere
+    [Tooltip("Disables game over when player is hit")]
+    public bool DisableGameOver = false;
+    
+    [Tooltip("Disables switching levels on killing all enemies")]
+    public bool DisableSwitchOnSuccess = false;
+
     private EnemyManager? enemyManager;
     private LevelManager? levelManager;
     
@@ -50,6 +59,8 @@ public class GameManager : MonoBehaviour {
     }
 
     private void OnGameOver() {
+        if (DisableGameOver) return;
+        
         StartCoroutine(HandleGameOver());
     }
 
@@ -82,7 +93,7 @@ public class GameManager : MonoBehaviour {
     private void OnAllEnemiesKilled() {
         // The EnemyManager is going to be calling this a ton when we're loading the level
         // so just ignore it (it's easier this way)
-        if (isLevelLoading) return;
+        if (isLevelLoading || DisableSwitchOnSuccess) return;
         
         StartCoroutine(HandleLevelSwitch());
     }

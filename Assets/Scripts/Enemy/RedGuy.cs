@@ -88,8 +88,7 @@ sealed class UnarmedChaseState : State {
                 foundThrowableObject = parentPointer.Parent;
             }
 
-            bool isPickupAGun = foundThrowableObject.WeaponPrefab! is Gun;
-            if (foundThrowableObject == null || !isPickupAGun) {
+            if (foundThrowableObject == null || foundThrowableObject.WeaponPrefab! is not Gun) {
                 continue;
             }
 

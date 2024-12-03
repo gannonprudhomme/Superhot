@@ -442,7 +442,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Camera: {fileID: 1578631756842526021}
-  StartingWeapon: {fileID: 0}
+  StartingWeapon: {fileID: 6200663451547197016}
   GunSpawnPoint: {fileID: 396000932328867625}
   ThrowableSpawnPoint: {fileID: 4071444560264924862}
   Muzzle: {fileID: 4114076202807892538}
@@ -709,6 +709,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3295149213964644117, guid: 5fdaaee26310b49e588d6e16a80e3c6a, type: 3}
   m_PrefabInstance: {fileID: 533944778840791963}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6200663451547197016 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5865337614521664963, guid: 5fdaaee26310b49e588d6e16a80e3c6a, type: 3}
+  m_PrefabInstance: {fileID: 533944778840791963}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a1853413b9c94ae39f476951ef2c7d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6397218056523794433
 PrefabInstance:
   m_ObjectHideFlags: 0

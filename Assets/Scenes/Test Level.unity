@@ -171,10 +171,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Red Guy (2)
       objectReference: {fileID: 0}
-    - target: {fileID: 5944466225402746086, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -512,9 +508,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1301322482}
   - {fileID: 86297688}
-  - {fileID: 848249431}
   - {fileID: 847271535}
   - {fileID: 1733804902}
   m_Father: {fileID: 0}
@@ -677,10 +671,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Pistol Red Guy (1)
       objectReference: {fileID: 0}
-    - target: {fileID: 9109574753712525345, guid: add7d52dd48d6194c8c9957f14db53c4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -690,72 +680,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4322471439052635108, guid: add7d52dd48d6194c8c9957f14db53c4, type: 3}
   m_PrefabInstance: {fileID: 847271534}
-  m_PrefabAsset: {fileID: 0}
---- !u!1001 &848249430
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 176891613}
-    m_Modifications:
-    - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -21.230001
-      objectReference: {fileID: 0}
-    - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.002
-      objectReference: {fileID: 0}
-    - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -6.2000003
-      objectReference: {fileID: 0}
-    - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5944466225402746086, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_Name
-      value: Red Guy (3)
-      objectReference: {fileID: 0}
-    - target: {fileID: 5944466225402746086, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
---- !u!4 &848249431 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-  m_PrefabInstance: {fileID: 848249430}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &928323496
 GameObject:
@@ -964,11 +888,11 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 176891613}
+    m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.58
+      value: 2.1100001
       objectReference: {fileID: 0}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalPosition.y
@@ -976,11 +900,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 13.01
+      value: 8.030001
       objectReference: {fileID: 0}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.42123222
       objectReference: {fileID: 0}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalRotation.x
@@ -988,7 +912,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: -0.9069528
       objectReference: {fileID: 0}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalRotation.z
@@ -1000,7 +924,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -130.175
       objectReference: {fileID: 0}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -1015,11 +939,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
---- !u!4 &1301322482 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
-  m_PrefabInstance: {fileID: 1301322481}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1356586158
 GameObject:
   m_ObjectHideFlags: 0
@@ -1319,17 +1238,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4623220789201850696, guid: add7d52dd48d6194c8c9957f14db53c4, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: -876546973899608171, guid: 4b0d7c6481c0cca4a865270b9ce20891, type: 3}
     - target: {fileID: 9109574753712525345, guid: add7d52dd48d6194c8c9957f14db53c4, type: 3}
       propertyPath: m_Name
       value: Pistol Red Guy (2)
       objectReference: {fileID: 0}
-    - target: {fileID: 9109574753712525345, guid: add7d52dd48d6194c8c9957f14db53c4, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 3236800263756603919, guid: add7d52dd48d6194c8c9957f14db53c4, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: add7d52dd48d6194c8c9957f14db53c4, type: 3}
@@ -1706,3 +1624,4 @@ SceneRoots:
   - {fileID: 9195488826105587646}
   - {fileID: 98095609}
   - {fileID: 303439782}
+  - {fileID: 1301322481}
