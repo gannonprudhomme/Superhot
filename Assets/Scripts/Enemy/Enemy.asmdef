@@ -4,7 +4,8 @@
     "references": [
         "Physics",
         "Weapons]",
-        "Events"
+        "Events",
+        "Unity.Animation.Rigging"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

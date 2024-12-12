@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.VFX;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
@@ -429,6 +430,9 @@ sealed class KilledState : State {
     typeof(NavMeshAgent),
     typeof(Animator),
     typeof(Rigidbody)
+)]
+[RequireComponent(
+    typeof(RigBuilder)
 )]
 public class RedGuy : MonoBehaviour { // TODO: I might as well just call this Enemy
     [Header("Local references")]
