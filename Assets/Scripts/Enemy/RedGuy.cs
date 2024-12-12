@@ -11,6 +11,10 @@ using Random = UnityEngine.Random;
 struct AnimationStates {
     public const string Idle = "Base Layer.Idle";
     public const string Melee = "Base Layer.Melee";
+    public const string AimPistol = "Base Layer.Aim Pistol";
+    public const string Damaged = "Base Layer.Damaged 1";
+    public const string PunchRight = "Base Layer.Punch Right";
+    public const string MeleeIdle = "Base Layer.Melee Idle";
 }
 
 // I'm wondering if we need a movement state and an attack state
@@ -32,6 +36,10 @@ sealed class UnarmedChaseState : State {
     
     public UnarmedChaseState(Transform fistTransform) {
         this.fistTransform = fistTransform;
+    }
+    
+    public void OnEnter(RedGuy redGuy) {
+        redGuy.PlayAnimation(AnimationStates.MeleeIdle);
     }
     
     public void OnUpdate(RedGuy redGuy) {
@@ -129,7 +137,7 @@ sealed class UnarmedAttackState : State {
 
         // Start the animation
         // redGuy.animator!.CrossFade(AnimationStates.Melee, 0.25f); // Idk what to t this to
-        redGuy.animator!.Play(AnimationStates.Melee);
+        redGuy.PlayAnimation(AnimationStates.PunchRight);
     }
 
     public void OnUpdate(RedGuy redGuy) {
@@ -162,7 +170,7 @@ sealed class UnarmedAttackState : State {
 
     public void OnExit(RedGuy redGuy) {
         // Go back to idle I guess? Idk
-        redGuy.animator!.Play(AnimationStates.Idle);
+        // redGuy.animator!.PlayAnimation(AnimationStates.Idle);
     }
 
     private void DamagePlayer() {
@@ -275,6 +283,7 @@ sealed class FireGunState : State {
     }
 }
 
+// Add "Equipped" to this name probably?
 sealed class StrafeAndFireGunState : State {
     private readonly Gun gun;
 
@@ -283,6 +292,8 @@ sealed class StrafeAndFireGunState : State {
     }
 
     public void OnEnter(RedGuy redGuy) {
+        redGuy.PlayAnimation(AnimationStates.AimPistol);
+        
         // Find a strafe position, maybe within a 30 degree angle of between the redGuy and the player
         // and then strafe to that position
         // and then fire
@@ -332,6 +343,7 @@ sealed class StrafeAndFireGunState : State {
     }
 }
 
+// Add "Equipped" to this name probably?
 // We have a gun equipped, and want to find line of sight as soon as we can
 // once we do, we'll switch to the Fire state
 sealed class GunFindLineOfSightState: State {
@@ -344,6 +356,8 @@ sealed class GunFindLineOfSightState: State {
     }
 
     public void OnEnter(RedGuy redGuy) {
+        redGuy.PlayAnimation(AnimationStates.AimPistol);
+        
         redGuy.SetDestination(target.AimPoint!.position);
     }
     
@@ -371,6 +385,8 @@ sealed class InterruptedState : State {
     }
     
     public void OnEnter(RedGuy redGuy) {
+        redGuy.PlayAnimation(AnimationStates.Damaged);
+        
         unscaledTimeOfAnimStart = Time.unscaledTime;
         
         // TODO: Play the "flinch" animation
@@ -606,6 +622,12 @@ public class RedGuy : MonoBehaviour { // TODO: I might as well just call this En
         }
     }
 
+    public void PlayAnimation(string animationName) {
+        const float transitionDuration = 0.1f;
+        
+        animator!.CrossFade(animationName, transitionDuration);
+    }
+    
     /*
     public float pickupradius = 5f;
     private void OnDrawGizmosSelected() {

@@ -82,7 +82,10 @@ public class Bullet : MonoBehaviour {
         OnHit(closestHit.point, closestHit.normal, closestHit.collider);
         
         if (ForceArePrefab != null) {
-            Instantiate(ForceArePrefab, closestHit.point, transform.rotation);
+            var forceArea = Instantiate(ForceArePrefab, closestHit.point, transform.rotation);
+            // turn down the force
+            // being able to turn down the radius would be nice, I don't want to use a prefab
+            forceArea.Force = 300f;
         }
     }
 

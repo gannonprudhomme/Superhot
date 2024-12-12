@@ -3,6 +3,7 @@
 // #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/"
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/Shadow/HDShadowAlgorithms.hlsl"
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/Lighting.hlsl"
+#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/LightLoop.hlsl"
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightEvaluation.hlsl"
 
 #ifndef CUSTOM_LIGHTING_INCLUDED // idk what this does
@@ -20,6 +21,10 @@ void MainLight_float(
     out float3 Color,
     out float DistanceAtten,
 
+    // TODO: It is apparently really hard to get shadow attenuation in HDRP
+    // why the fuck
+    // it's apparently possible with forward rendering, though idk if I can use that
+    // if I have to go back to URP I swear to god
     out float ShadowAtten,
 
     out float3 Specular
@@ -37,7 +42,10 @@ void MainLight_float(
     float4 shadowCoord = float4(1, 1, 1, 0);
     Smoothness = exp2(10 * Smoothness + 1);
 
-    Light mainLight = GetMainLight(shadowCoord);
+    // I guess we can do something with this?
+    HDDirectionalShadowData thing = _HDDirectionalShadowData[0];
+
+    float4 mainLight = _DirectionalLightDatas[0]; // this is suppposed to be a thing but I can't find it
     Direction = mainLight.direction;
     Color = mainLight.color;
     DistanceAtten = mainLight.distanceAttenuation;
@@ -45,7 +53,8 @@ void MainLight_float(
 	#if !defined(_MAIN_LIGHT_SHADOWS) || defined(_RECEIVE_SHADOWS_OFF)
 		ShadowAtten = 1.0h;
 	#else
-        ShadowSamplingData shadowSamplingData = GetMainLightShadowSamplingData();
+        // ShadowSamplingData shadowSamplingData = GetMainLightShadowSamplingData();
+        HDDirectionalShadowData shadowSamplingData = _HDDirectionalShadowData[0];
         float shadowStrength = GetMainLightShadowStrength();
         ShadowAtten = SampleShadowmap(
             shadowCoord,

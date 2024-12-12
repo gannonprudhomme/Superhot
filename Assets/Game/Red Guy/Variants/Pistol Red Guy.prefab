@@ -14,7 +14,7 @@ PrefabInstance:
       objectReference: {fileID: 2414289314491451790}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -13.23
       objectReference: {fileID: 0}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalPosition.y
@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 8.72
       objectReference: {fileID: 0}
     - target: {fileID: 1723130087866777379, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalRotation.w
@@ -54,11 +54,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2542194869398986860, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.616
+      value: 0.4009266
       objectReference: {fileID: 0}
     - target: {fileID: 2542194869398986860, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.088
+      value: 1.0224581
+      objectReference: {fileID: 0}
+    - target: {fileID: 3313806546111152178, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
+      propertyPath: m_TranslationAtRest.x
+      value: 0.4009266
+      objectReference: {fileID: 0}
+    - target: {fileID: 3313806546111152178, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
+      propertyPath: m_TranslationAtRest.z
+      value: 1.0224581
+      objectReference: {fileID: 0}
+    - target: {fileID: 3313806546111152178, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
+      propertyPath: m_TranslationOffset.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3313806546111152178, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
+      propertyPath: m_TranslationOffset.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5944466225402746086, guid: db87dd7a7c681974a8d57fc675d1d3fa, type: 3}
       propertyPath: m_Name
